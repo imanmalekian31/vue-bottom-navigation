@@ -25,7 +25,9 @@
   "main": "src/install.js",
   "dependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "express": "^4.17.1",
+    "server-static": "^2.0.5"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -34,8 +36,7 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "express": "^4.17.1",
-    "server-static": "^2.0.5",
+
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

@@ -1,0 +1,60 @@
+{
+  "name": "vue-bottom-navigation",
+  "version": "0.1.0",
+  "private": false,
+  "author": {
+    "name": "Iman Malekian",
+    "email": "imanmalekian@gmail.com"
+  },
+  "repository": "https://github.com/imanmalekian31/vue-bottom-navigation",
+  "bugs": "https://github.com/imanmalekian31/vue-bottom-navigation/issues",
+  "keywords": [
+    "vue",
+    "bottom",
+    "navigation",
+    "custom"
+  ],
+  "license": "MIT",
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "build-library": "vue-cli-service build --target lib --name vue-bottom-navigation ./src/install.js",
+    "lint": "vue-cli-service lint",
+    "start": "node server.js"
+  },
+  "main": "src/install.js",
+  "dependencies": {
+    "@fortawesome/fontawesome-free": "^5.15.4",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "babel-eslint": "^10.1.0",
+    "eslint": "^6.7.2",
+    "eslint-plugin-vue": "^6.2.2",
+    "express": "^4.17.1",
+    "server-static": "^2.0.5",
+    "vue-template-compiler": "^2.6.11"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead"
+  ]
+}

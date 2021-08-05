@@ -61,7 +61,6 @@ export default {
       default: "#FBC02D",
     },
   },
-  data: () => ({ val: 2 }),
   mounted() {
     this.cssLoader();
   },
@@ -78,31 +77,33 @@ export default {
   methods: {
     cssLoader() {
       let customStyle = "";
+      const containerWidth =
+        document.querySelector(".btn-containrt").offsetWidth ||
+        window.innerWidth;
       this.options.forEach((item, index) => {
         customStyle += `
         .btn-item-${index} {
           padding: 10px;
           transition: transform 100ms ease;
-          width : ${window.innerWidth / this.options.length}px;
+          width : ${containerWidth / this.options.length}px !important;
           display: flex;
           justify-content :center;
           align-items : center;
           position: relative;
           z-index: 10;
-          cursor: pointer;
         }
 
         #btn-${index}:checked ~ #sweep {
-          transform: translateX(${(index * window.innerWidth) /
+          transform: translateX(${(index * containerWidth) /
             this.options.length +
-            window.innerWidth / this.options.length / 4}px);
+            containerWidth / this.options.length / 4}px);
           transition: transform 500ms ease;
         }
         `;
       });
 
       document.getElementById("sweep").style.left = `
-      ${window.innerWidth / this.options.length / 4 - 67.5}px`;
+      ${containerWidth / this.options.length / 4 - 67.5}px`;
 
       const cssId = "buttom-navigation-style";
       if (!document.getElementById(cssId)) {
@@ -164,6 +165,7 @@ input {
   align-items: center;
   transition: all 300ms ease;
   position: absolute;
+  top: 10px;
   background: white;
   color: rgba(0, 0, 0, 0.54);
 }
@@ -261,6 +263,12 @@ input:not(:checked) + .labels .btn-title {
   top: 0;
   right: 0;
   box-shadow: 40px -40px 0 0 var(--color);
+}
+
+@media screen and (min-width: 576px) {
+  .labels {
+    cursor: pointer;
+  }
 }
 
 @keyframes fadein {

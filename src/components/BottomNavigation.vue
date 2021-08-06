@@ -151,7 +151,7 @@ input {
   align-items: flex-end;
   bottom: 0;
   width: 100%;
-  z-index: 5;
+  z-index: 2147483647;
   height: 60px;
   background: var(--color);
 }
@@ -163,7 +163,6 @@ input {
   justify-content: space-around;
   background-color: #fff;
   width: 100%;
-  z-index: 5;
   height: 55px;
 }
 

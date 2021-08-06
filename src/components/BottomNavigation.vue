@@ -63,6 +63,7 @@ export default {
   },
   mounted() {
     this.cssLoader();
+    window.addEventListener("resize", this.onResize);
   },
   computed: {
     cssVariables() {
@@ -74,12 +75,17 @@ export default {
       return styles;
     },
   },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.onResize);
+  },
   methods: {
     cssLoader() {
       let customStyle = "";
       const containerWidth =
         document.querySelector(".btn-containrt").offsetWidth ||
         window.innerWidth;
+      const sweepWidth = document.getElementById("sweep").offsetWidth;
+
       this.options.forEach((item, index) => {
         customStyle += `
         .btn-item-${index} {
@@ -103,25 +109,30 @@ export default {
       });
 
       document.getElementById("sweep").style.left = `
-      ${containerWidth / this.options.length / 4 - 67.5}px`;
+      ${containerWidth / this.options.length / 4 - sweepWidth / 2}px`;
 
-      const cssId = "buttom-navigation-style";
-      if (!document.getElementById(cssId)) {
-        var head = document.getElementsByTagName("head")[0];
-        var style = document.createElement("style");
-        style.id = cssId;
+      var head = document.getElementsByTagName("head")[0];
+      var style = document.createElement("style");
+      style.id = "bottom-navigation-style";
 
-        if (style.styleSheet) {
-          style.styleSheet.cssText = customStyle;
-        } else {
-          style.appendChild(document.createTextNode(customStyle));
-        }
-
-        head.appendChild(style);
+      if (style.styleSheet) {
+        style.styleSheet.cssText = customStyle;
+      } else {
+        style.appendChild(document.createTextNode(customStyle));
       }
+
+      head.appendChild(style);
     },
     updateValue(value) {
       this.$emit("update", value.target.value);
+    },
+    onResize() {
+      setTimeout(() => {
+        const styleElement = document.getElementById("buttom-navigation-style");
+        styleElement && styleElement.remove();
+      }, 0);
+
+      this.cssLoader();
     },
   },
 };

@@ -1,4 +1,4 @@
-# vue-radio-button
+# vue-bottom-navigation
 
 ![Image of Navigation](https://user-images.githubusercontent.com/58827166/128373429-cf68662c-0f6e-4a25-ba1b-d26b32956d16.png)
 

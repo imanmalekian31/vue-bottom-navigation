@@ -1,7 +1,10 @@
 <template>
   <div id="btn-app">
     <h1>Vue Bottom Navigation</h1>
-    <a href="https://github.com/imanmalekian31/vue-radio-button" target="blank">
+    <a
+      href="https://github.com/imanmalekian31/vue-bottom-navigation"
+      target="blank"
+    >
       <img width="40" height="40" :src="require('./assets/github-logo.png')" />
     </a>
 

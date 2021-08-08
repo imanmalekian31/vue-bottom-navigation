@@ -12,7 +12,6 @@
           :checked="button.id === value"
           @input="updateValue"
         />
-
         <label
           :key="`label-${index}`"
           :class="`btn-item-${index} labels`"
@@ -23,9 +22,18 @@
             <div class="btn-badge" v-if="button.badge">
               {{ button.badge }}
             </div>
-            <i :class="`${button.icon}`" />
+            <slot name="icon" v-if="hasSlot('icon')" :props="button" />
+            <template v-else>
+              <i :class="`${button.icon}`" />
+            </template>
           </div>
-          <div class="btn-title">{{ button.title }}</div>
+
+          <div class="btn-title">
+            <slot name="title" v-if="hasSlot('title')" :props="button" />
+            <template v-else>
+              {{ button.title }}
+            </template>
+          </div>
         </label>
       </template>
 
@@ -133,6 +141,9 @@ export default {
       }, 0);
 
       this.cssLoader();
+    },
+    hasSlot(slotName) {
+      return this.$slots[slotName] || this.$scopedSlots[slotName];
     },
   },
 };

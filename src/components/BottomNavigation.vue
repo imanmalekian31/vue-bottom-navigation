@@ -15,7 +15,6 @@
         <label
           :key="`label-${index}`"
           :class="`btn-item-${index} labels`"
-          plain
           :for="`btn-${index}`"
         >
           <div class="active-label">

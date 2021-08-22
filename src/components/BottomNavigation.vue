@@ -134,10 +134,10 @@ export default {
       this.$emit("update", value.target.value);
     },
     onResize() {
-      setTimeout(() => {
-        const styleElement = document.getElementById("buttom-navigation-style");
+      this.$nextTick(() => {
+        const styleElement = document.getElementById("bottom-navigation-style");
         styleElement && styleElement.remove();
-      }, 0);
+      });
 
       this.cssLoader();
     },

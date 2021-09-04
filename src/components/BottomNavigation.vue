@@ -25,6 +25,14 @@
             <template v-else>
               <i :class="`${button.icon}`" />
             </template>
+
+            <div
+              class="btn-super-parant"
+              v-if="hasChild(button)"
+              :key="`iman${index}`"
+            >
+              <Child :childs="button.childs" />
+            </div>
           </div>
 
           <div class="btn-title">
@@ -46,7 +54,10 @@
 </template>
 
 <script>
+import Child from "./Child.vue";
+
 export default {
+  components: { Child },
   model: {
     prop: "value",
     event: "update",
@@ -74,9 +85,15 @@ export default {
   },
   computed: {
     cssVariables() {
+      const countChilds = (
+        (this.options.find((option) => option.id == this.value) || {}).childs ||
+        []
+      ).length;
+
       const styles = {
         "--color": this.color,
         "--color-badge": this.badgeColor,
+        "--width-parent": `${countChilds * 45}px`,
       };
 
       return styles;
@@ -113,6 +130,19 @@ export default {
           transition: transform 500ms ease;
         }
         `;
+
+        if (this.hasChild(item)) {
+          item.childs.forEach((child, idx) => {
+            customStyle += `
+            input:checked + .btn-item-${index} .btn-child:nth-child(${idx +
+              1}) {
+              transform: translateX(${(0.5 + idx) * 45 -
+                (item.childs.length * 45) / 2}px);
+              transition: transform 500ms ease 300ms;
+            }
+          `;
+          });
+        }
       });
 
       document.getElementById("sweep").style.left = `
@@ -144,17 +174,31 @@ export default {
     hasSlot(slotName) {
       return this.$slots[slotName] || this.$scopedSlots[slotName];
     },
+    hasChild(button) {
+      return (button.childs || []).length;
+    },
   },
 };
 </script>
 
 <style scoped>
+.btn-super-parant {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  bottom: 35px;
+  width: var(--width-parent);
+  height: 60px;
+  z-index: -20;
+}
+
 input {
   display: none;
 }
 
 .btn-containrt_foreground {
-  overflow: hidden;
+  /* overflow: hidden; */
   position: fixed;
   direction: ltr;
   display: flex;
@@ -167,7 +211,7 @@ input {
 }
 
 .btn-containrt {
-  overflow: hidden;
+  /* overflow: hidden; */
   direction: ltr;
   display: flex;
   justify-content: space-around;
@@ -186,7 +230,7 @@ input {
   transition: all 300ms ease;
   position: absolute;
   top: 10px;
-  background: white;
+  background: #fff !important;
   color: rgba(0, 0, 0, 0.54);
 }
 

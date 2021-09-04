@@ -23,19 +23,15 @@
 ```shell
 
 # npm
-
 $ npm install bottom-navigation-vue
 
-
 #yarn
-
 $ yarn add bottom-navigation-vue
 
 ```
 
 ```js
 import Vue from "vue";
-
 import VueBottomNavigation from "bottom-navigation-vue";
 
 Vue.use(VueBottomNavigation);

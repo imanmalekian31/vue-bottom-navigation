@@ -1,6 +1,8 @@
 # vue-bottom-navigation
 
-![Image of Navigation](https://user-images.githubusercontent.com/58827166/128373429-cf68662c-0f6e-4a25-ba1b-d26b32956d16.png)
+<p align="center">
+<img align="center"  src="https://user-images.githubusercontent.com/58827166/132668893-d7912fe1-40da-4735-a171-90553a92fecd.gif"/>
+</p>
 
 # Table of Contents
 
@@ -21,21 +23,15 @@
 # Installation
 
 ```shell
-
 # npm
-
 $ npm install bottom-navigation-vue
 
-
 #yarn
-
 $ yarn add bottom-navigation-vue
-
 ```
 
 ```js
 import Vue from "vue";
-
 import VueBottomNavigation from "bottom-navigation-vue";
 
 Vue.use(VueBottomNavigation);
@@ -55,11 +51,31 @@ Vue.use(VueBottomNavigation);
     data: () => ({
       selected: 1,
       options: [
-        { id: 1, icon: "fas fa-home", title: "Home", badge: 1 },
-        { id: 2, icon: "fas fa-layer-group", title: "Category" },
-        { id: 3, icon: "fas fa-cog", title: "Setting" },
-        { id: 4, icon: "fas fa-user", title: "Account", badge: 15 },
-        { id: 5, icon: "fas fa-bell", title: "Notifcation" },
+        {
+          id: 1,
+          icon: "fas fa-home",
+          title: "Home",
+          childs: [
+            { id: 101, icon: "fas fa-tshirt", title: "Products" },
+            { id: 102, icon: "fas fa-tag", title: "Discount" },
+            { id: 103, icon: "fas fa-gifts", title: "Gifts", badge: 7 },
+          ],
+        },
+        { id: 2, icon: "fas fa-wallet", title: "Wallet" },
+        {
+          id: 3,
+          icon: "fas fa-plus",
+          title: "Setting",
+          childs: [
+            { id: 301, icon: "fas fa-bookmark", title: "Bookmarks" },
+            { id: 302, icon: "fas fa-tasks", title: "Tasks" },
+            { id: 303, icon: "fas fa-tachometer-alt", title: "Dashboard" },
+            { id: 304, icon: "fas fa-ticket-alt", title: "Tickets" },
+            { id: 305, icon: "fas fa-file-signature", title: "Contract" },
+          ],
+        },
+        { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
+        { id: 5, icon: "fas fa-user", title: "Account" },
       ],
     }),
   };
@@ -68,12 +84,12 @@ Vue.use(VueBottomNavigation);
 
 ## Constructor Options
 
-| Key          | Type           | Description               | Default    |
-| :----------- | -------------- | ------------------------- | ---------- |
-| `value`      | String, Number | selected button           | `null`     |
-| `options`    | Array          | list of buttons           | `required` |
-| `color`      | String         | color of the foreground   | `#42A5F5`  |
-| `badgeColor` | String         | color of the button badge | `#FBC02D`  |
+| Key               | Type           | Description               | Default    |
+| :---------------- | -------------- | ------------------------- | ---------- |
+| `value`           | String, Number | selected button           | `null`     |
+| `options`         | Array          | list of buttons           | `required` |
+| `foregroundColor` | String         | color of the foreground   | `#42A5F5`  |
+| `badgeColor`      | String         | color of the button badge | `#FBC02D`  |
 
 Your options need `id` and `icon`, which is Font Awesome class.
 Additionally, you can add `title` for buttons.

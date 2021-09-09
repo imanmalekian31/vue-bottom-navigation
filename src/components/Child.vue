@@ -1,8 +1,16 @@
 <template>
   <div class="btn-child-parent">
-    <div class="btn-child" v-for="(child, idx) in childs" :key="idx">
+    <div
+      class="btn-child"
+      v-for="(child, idx) in childs"
+      :key="idx"
+      @click.stop="$emit('update', child.id)"
+    >
       <i :class="`${child.icon}`" />
       <span class="btn-child-title">{{ child.title }}</span>
+      <div class="btn-child-badge" v-if="child.badge">
+        {{ child.badge }}
+      </div>
     </div>
   </div>
 </template>
@@ -19,6 +27,22 @@ export default {
 </script>
 
 <style scoped>
+.btn-child-badge {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -4px;
+  left: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  color: #fff;
+  background: var(--color-badge);
+  opacity: 0;
+}
+
 .btn-child-parent {
   position: absolute;
   bottom: -35px;
@@ -28,6 +52,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  background: var(--color-foreground);
 }
 
 .btn-child {
@@ -40,6 +65,7 @@ export default {
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: rgba(0, 0, 0, 0.54);
 }
 
 .btn-child-title {
@@ -49,11 +75,19 @@ export default {
   top: 35px;
 }
 
-input:checked + .labels .btn-child-parent {
-  animation: foreground 500ms ease-in-out forwards;
+.unchecked .btn-child-parent {
+  background: transparent;
 }
 
-input:checked + .labels .btn-child-title {
+.checked .btn-class-showable .btn-child-parent {
+  animation: chil-background 500ms ease-in-out forwards;
+}
+
+.checked .btn-class-showable .btn-child-title {
+  animation: child-title 500ms ease-in-out forwards;
+}
+
+.checked .btn-class-showable .btn-child-badge {
   animation: child-title 500ms ease-in-out forwards;
 }
 
@@ -66,34 +100,28 @@ input:checked + .labels .btn-child-title {
   }
 }
 
-@keyframes foreground {
+@keyframes chil-background {
   0% {
     bottom: -30px;
-  }
-
-  10% {
-    background: #42a5f5;
+    background: transparent;
   }
 
   25% {
     bottom: 20px;
     width: 35px;
     height: 35px;
-    background: #42a5f5;
   }
 
   40% {
     bottom: 20px;
     width: 35px;
     height: 40px;
-    background: #42a5f5;
   }
 
   100% {
     bottom: 20px;
     width: 100%;
     height: 40px;
-    background: #42a5f5;
   }
 }
 </style>

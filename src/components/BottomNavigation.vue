@@ -1,53 +1,48 @@
 <template>
   <div class="btn-containrt_foreground" :style="cssVariables">
     <div class="btn-containrt">
-      <template v-for="(button, index) in options">
-        <input
-          class="btn-item"
-          type="radio"
-          name="bottom-navigation"
-          :value="button.id"
-          :id="`btn-${index}`"
-          :key="index"
-          :checked="button.id === value"
-          @input="updateValue"
-        />
-        <label
-          :key="`label-${index}`"
-          :class="`btn-item-${index} labels`"
-          :for="`btn-${index}`"
+      <div
+        v-for="(button, index) in localOptions"
+        :key="`label-${index}`"
+        :class="{
+          [`btn-item-${index} labels`]: true,
+          ['checked']: button.isActive,
+          ['unchecked']: !button.isActive,
+        }"
+        @click="handleLabelClick(button)"
+      >
+        <div class="active-label">
+          <div class="btn-badge" v-if="button.badge">
+            {{ button.badge }}
+          </div>
+          <slot name="icon" v-if="hasSlot('icon')" :props="button" />
+          <template v-else>
+            <i :class="`${button.icon}`" />
+          </template>
+        </div>
+
+        <div class="btn-title">
+          <slot name="title" v-if="hasSlot('title')" :props="button" />
+          <template v-else>
+            {{ button.title }}
+          </template>
+        </div>
+
+        <div
+          v-if="hasChild(button)"
+          :class="{
+            ['btn-super-parant']: button.isActive,
+            ['btn-class-showable']: showable,
+          }"
         >
-          <div class="active-label">
-            <div class="btn-badge" v-if="button.badge">
-              {{ button.badge }}
-            </div>
-            <slot name="icon" v-if="hasSlot('icon')" :props="button" />
-            <template v-else>
-              <i :class="`${button.icon}`" />
-            </template>
+          <child :childs="button.childs || []" @update="handleChildClick" />
+        </div>
+      </div>
 
-            <div
-              class="btn-super-parant"
-              v-if="hasChild(button)"
-              :key="`iman${index}`"
-            >
-              <Child :childs="button.childs" />
-            </div>
-          </div>
-
-          <div class="btn-title">
-            <slot name="title" v-if="hasSlot('title')" :props="button" />
-            <template v-else>
-              {{ button.title }}
-            </template>
-          </div>
-        </label>
-      </template>
-
-      <div id="sweep" v-show="value">
-        <div id="sweep-right"></div>
-        <div id="sweep-center"></div>
-        <div id="sweep-left"></div>
+      <div id="sweep" v-show="hasActiveClass">
+        <div id="sweep-right" />
+        <div id="sweep-center" />
+        <div id="sweep-left" />
       </div>
     </div>
   </div>
@@ -70,7 +65,7 @@ export default {
       type: Array,
       default: () => [],
     },
-    color: {
+    foregroundColor: {
       type: String,
       default: "#42A5F5",
     },
@@ -79,6 +74,16 @@ export default {
       default: "#FBC02D",
     },
   },
+  data: () => ({
+    localOptions: [],
+    showable: false,
+  }),
+  created() {
+    this.localOptions = this.options.map((option) => ({
+      ...option,
+      isActive: this.isActive(option),
+    }));
+  },
   mounted() {
     this.cssLoader();
     window.addEventListener("resize", this.onResize);
@@ -86,17 +91,20 @@ export default {
   computed: {
     cssVariables() {
       const countChilds = (
-        (this.options.find((option) => option.id == this.value) || {}).childs ||
-        []
+        (this.localOptions.find((option) => option.isActive) || {}).childs || []
       ).length;
 
       const styles = {
-        "--color": this.color,
+        "--color-foreground": this.foregroundColor,
         "--color-badge": this.badgeColor,
         "--width-parent": `${countChilds * 45}px`,
       };
 
       return styles;
+    },
+
+    hasActiveClass() {
+      return this.localOptions.some((option) => option.isActive);
     },
   },
   beforeDestroy() {
@@ -108,9 +116,26 @@ export default {
       const containerWidth =
         document.querySelector(".btn-containrt").offsetWidth ||
         window.innerWidth;
-      const sweepWidth = document.getElementById("sweep").offsetWidth;
 
       this.options.forEach((item, index) => {
+        if (index === 0 && this.hasChild(item)) {
+          customStyle += `
+          .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
+            transform: translateX(${(item.childs.length * 45) / 2 - 35}px);
+            transition: transform 500ms ease 300ms;
+          }
+          `;
+        }
+
+        if (index === this.options.length - 1 && this.hasChild(item)) {
+          customStyle += `
+          .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
+            transform: translateX(-${(item.childs.length * 45) / 2 - 35}px);
+            transition: transform 500ms ease 300ms;
+          }
+          `;
+        }
+
         customStyle += `
         .btn-item-${index} {
           padding: 10px;
@@ -123,7 +148,7 @@ export default {
           z-index: 10;
         }
 
-        #btn-${index}:checked ~ #sweep {
+        .btn-item-${index}.checked ~ #sweep {
           transform: translateX(${(index * containerWidth) /
             this.options.length +
             containerWidth / this.options.length / 4}px);
@@ -134,7 +159,7 @@ export default {
         if (this.hasChild(item)) {
           item.childs.forEach((child, idx) => {
             customStyle += `
-            input:checked + .btn-item-${index} .btn-child:nth-child(${idx +
+            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${idx +
               1}) {
               transform: translateX(${(0.5 + idx) * 45 -
                 (item.childs.length * 45) / 2}px);
@@ -146,7 +171,7 @@ export default {
       });
 
       document.getElementById("sweep").style.left = `
-      ${containerWidth / this.options.length / 4 - sweepWidth / 2}px`;
+      ${containerWidth / this.options.length / 4 - 135 / 2}px`;
 
       var head = document.getElementsByTagName("head")[0];
       var style = document.createElement("style");
@@ -160,8 +185,34 @@ export default {
 
       head.appendChild(style);
     },
-    updateValue(value) {
-      this.$emit("update", value.target.value);
+    handleLabelClick(button) {
+      if (!this.showable || button.isActive) {
+        this.toggleClass();
+      }
+
+      this.updateValue(button.id, this.hasChild(button));
+    },
+    handleChildClick(value) {
+      this.updateValue(value);
+      this.toggleClass();
+    },
+    updateValue(value, prevent = false) {
+      this.localOptions.forEach(
+        (option) => (option.isActive = this.isActive(option, value))
+      );
+
+      if (!prevent) {
+        this.$emit("update", value);
+      }
+    },
+    toggleClass() {
+      this.showable = !this.showable;
+    },
+    isActive(button, value = this.value) {
+      return (
+        button.id == value ||
+        (button.childs || []).find((child) => child.id == value)
+      );
     },
     onResize() {
       this.$nextTick(() => {
@@ -187,10 +238,10 @@ export default {
   justify-content: center;
   align-items: center;
   position: absolute;
-  bottom: 35px;
+  bottom: 55px;
   width: var(--width-parent);
   height: 60px;
-  z-index: -20;
+  z-index: -1;
 }
 
 input {
@@ -198,7 +249,6 @@ input {
 }
 
 .btn-containrt_foreground {
-  /* overflow: hidden; */
   position: fixed;
   direction: ltr;
   display: flex;
@@ -207,11 +257,10 @@ input {
   width: 100%;
   z-index: 2147483647;
   height: 60px;
-  background: var(--color);
+  background: var(--color-foreground);
 }
 
 .btn-containrt {
-  /* overflow: hidden; */
   direction: ltr;
   display: flex;
   justify-content: space-around;
@@ -253,22 +302,22 @@ input {
   background: var(--color-badge);
 }
 
-input:checked + .labels .active-label {
+.checked .active-label {
   transform: translateY(-10px);
 }
 
-input:checked + .labels .btn-title {
+.checked .btn-title {
   animation: fadein 200ms;
   position: absolute;
   top: 38px;
   font-size: 12px;
 }
 
-input:not(:checked) + .labels .active-label {
+.unchecked .active-label {
   background: transparent;
 }
 
-input:not(:checked) + .labels .btn-title {
+.unchecked .btn-title {
   visibility: hidden;
 }
 
@@ -285,7 +334,7 @@ input:not(:checked) + .labels .btn-title {
   height: 38px;
   display: flex;
   flex: 1;
-  background: var(--color);
+  background: var(--color-foreground);
   border-radius: 0 0 45% 45%;
 }
 
@@ -306,7 +355,7 @@ input:not(:checked) + .labels .btn-title {
   border-radius: 50%;
   top: 0;
   left: 0;
-  box-shadow: -40px -40px 0 0 var(--color);
+  box-shadow: -40px -40px 0 0 var(--color-foreground);
 }
 
 #sweep-right {
@@ -326,7 +375,7 @@ input:not(:checked) + .labels .btn-title {
   border-radius: 50%;
   top: 0;
   right: 0;
-  box-shadow: 40px -40px 0 0 var(--color);
+  box-shadow: 40px -40px 0 0 var(--color-foreground);
 }
 
 @media screen and (min-width: 576px) {

@@ -285,6 +285,8 @@ input {
 
 .btn-title {
   position: absolute;
+  color: rgba(0, 0, 0, 0.54);
+  font-size: 10px;
 }
 
 .btn-badge {
@@ -309,8 +311,7 @@ input {
 .checked .btn-title {
   animation: fadein 200ms;
   position: absolute;
-  top: 38px;
-  font-size: 12px;
+  top: 40px;
 }
 
 .unchecked .active-label {

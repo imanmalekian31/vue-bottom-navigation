@@ -72,7 +72,7 @@ export default {
   font-size: 10px;
   opacity: 0;
   position: absolute;
-  top: 35px;
+  top: 37px;
 }
 
 .unchecked .btn-child-parent {

@@ -223,7 +223,7 @@ export default {
       this.cssLoader();
     },
     hasSlot(slotName) {
-      return this.$slots[slotName] || this.$scopedSlots[slotName];
+      return this.$slots[slotName];
     },
     hasChild(button) {
       return (button.childs || []).length;

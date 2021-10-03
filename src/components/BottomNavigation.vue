@@ -74,6 +74,20 @@ export default {
       default: "#FBC02D",
     },
   },
+  watch: {
+    options: {
+      deep: true,
+      handler(newVal) {
+        if (newVal) {
+          this.localOptions = newVal.map((option) => ({
+            ...option,
+            isActive: this.isActive(option),
+          }));
+          this.cssLoader();
+        }
+      },
+    },
+  },
   data: () => ({
     localOptions: [],
     showable: false,

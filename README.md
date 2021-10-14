@@ -93,13 +93,19 @@ Vue.use(VueBottomNavigation);
 
 Your options need `id` and `icon`, which is Font Awesome class.
 Additionally, you can add `title` for buttons.
-Also you can use **Icon Slot** and **Title Slot** to customize your icon and title like below.
+Also you can use **Icon Slot** , **Title Slot** , **Child Icon Slot** and **Child Title Slot** to customize your icon and title like below.
 
 ```html
 <template>
   <VueBottomNavigation :options="options" v-model="selected">
     <template #icon="{ props }"> <v-icon>{{ props.icon }}</v-icon> </template>
     <template #title="{ props }"> <b>{{ props.title }}</b> </template>
+
+    <!-- child -->
+    <template #child-icon="{ props }">
+      <v-icon>{{ props.icon }}</v-icon>
+    </template>
+    <template #child-title="{ props }"> <b>{{ props.title }}</b> </template>
   </VueBottomNavigation>
 </template>
 ```

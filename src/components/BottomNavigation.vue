@@ -15,17 +15,15 @@
           <div class="btn-badge" v-if="button.badge">
             {{ button.badge }}
           </div>
-          <slot name="icon" v-if="hasSlot('icon')" :props="button" />
-          <template v-else>
+          <slot name="icon" :props="button">
             <i :class="`${button.icon}`" />
-          </template>
+          </slot>
         </div>
 
         <div class="btn-title">
-          <slot name="title" v-if="hasSlot('title')" :props="button" />
-          <template v-else>
+          <slot name="title" :props="button">
             {{ button.title }}
-          </template>
+          </slot>
         </div>
 
         <div
@@ -35,7 +33,28 @@
             ['btn-class-showable']: showable,
           }"
         >
-          <child :childs="button.childs || []" @update="handleChildClick" />
+          <div class="btn-child-parent">
+            <div
+              class="btn-child"
+              v-for="(child, idx) in button.childs || []"
+              :key="idx"
+              @click.stop="handleChildClick(child.id)"
+            >
+              <slot name="child-icon" :props="child">
+                <i :class="`${child.icon}`" />
+              </slot>
+
+              <span class="btn-child-title">
+                <slot name="child-title" :props="child">
+                  {{ child.title }}
+                </slot>
+              </span>
+
+              <div class="btn-child-badge" v-if="child.badge">
+                {{ child.badge }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -49,10 +68,7 @@
 </template>
 
 <script>
-import Child from "./Child.vue";
-
 export default {
-  components: { Child },
   model: {
     prop: "value",
     event: "update",
@@ -236,9 +252,6 @@ export default {
 
       this.cssLoader();
     },
-    hasSlot(slotName) {
-      return this.$slots[slotName];
-    },
     hasChild(button) {
       return (button.childs || []).length;
     },
@@ -407,6 +420,106 @@ input {
   to {
     opacity: 1;
     transform: translateY(0px);
+  }
+}
+
+/* child */
+
+.btn-child-badge {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: -4px;
+  left: 20px;
+  border-radius: 50%;
+  font-size: 12px;
+  color: #fff;
+  background: var(--color-badge);
+  opacity: 0;
+}
+
+.btn-child-parent {
+  position: absolute;
+  bottom: -35px;
+  width: 35px;
+  height: 35px;
+  border-radius: 100px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: var(--color-foreground);
+}
+
+.btn-child {
+  position: absolute;
+  height: 30px;
+  width: 30px;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.btn-child-title {
+  font-size: 10px;
+  opacity: 0;
+  position: absolute;
+  top: 37px;
+}
+
+.unchecked .btn-child-parent {
+  background: transparent;
+}
+
+.checked .btn-class-showable .btn-child-parent {
+  animation: chil-background 500ms ease-in-out forwards;
+}
+
+.checked .btn-class-showable .btn-child-title {
+  animation: child-title 500ms ease-in-out forwards;
+}
+
+.checked .btn-class-showable .btn-child-badge {
+  animation: child-title 500ms ease-in-out forwards;
+}
+
+@keyframes child-title {
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes chil-background {
+  0% {
+    bottom: -30px;
+    background: transparent;
+  }
+
+  25% {
+    bottom: 20px;
+    width: 35px;
+    height: 35px;
+  }
+
+  40% {
+    bottom: 20px;
+    width: 35px;
+    height: 40px;
+  }
+
+  100% {
+    bottom: 20px;
+    width: 100%;
+    height: 40px;
   }
 }
 </style>

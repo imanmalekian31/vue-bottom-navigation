@@ -233,7 +233,10 @@ export default {
 
       if (!prevent) {
         this.$emit("update", button.id);
-        this.$router.replace(button.path).catch(() => {});
+
+        if (button.path && Object.keys(button.path).length) {
+          this.$router.replace(button.path).catch(() => {});
+        }
       }
     },
     toggleClass() {

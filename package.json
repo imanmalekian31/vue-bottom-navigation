@@ -23,9 +23,7 @@
     "start": "node server.js"
   },
   "main": "src/install.js",
-  "dependencies": {
-    "vue": "^2.6.11"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@vue/cli-plugin-babel": "~4.5.0",
@@ -36,6 +34,7 @@
     "eslint-plugin-vue": "^6.2.2",
     "express": "^4.17.1",
     "server-static": "^2.0.5",
+    "vue": "^2.6.14",
     "vue-router": "^3.5.2",
     "vue-template-compiler": "^2.6.11"
   },

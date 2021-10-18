@@ -69,6 +69,7 @@
 
 <script>
 export default {
+  name: "VueBottomNavigation",
   model: {
     prop: "value",
     event: "update",

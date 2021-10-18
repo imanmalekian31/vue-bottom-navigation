@@ -14,6 +14,10 @@
 
 - [**Constructor Options**](#constructor-options)
 
+- [**Route**](#route)
+
+- [**Slots**](#slots)
+
 * [**License**](#license)
 
 # Demo
@@ -71,7 +75,6 @@ Vue.use(VueBottomNavigation);
             { id: 302, icon: "fas fa-tasks", title: "Tasks" },
             { id: 303, icon: "fas fa-tachometer-alt", title: "Dashboard" },
             { id: 304, icon: "fas fa-ticket-alt", title: "Tickets" },
-            { id: 305, icon: "fas fa-file-signature", title: "Contract" },
           ],
         },
         { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
@@ -84,16 +87,51 @@ Vue.use(VueBottomNavigation);
 
 ## Constructor Options
 
-| Key               | Type           | Description               | Default    |
-| :---------------- | -------------- | ------------------------- | ---------- |
-| `value`           | String, Number | selected button           | `null`     |
-| `options`         | Array          | list of buttons           | `required` |
-| `foregroundColor` | String         | color of the foreground   | `#42A5F5`  |
-| `badgeColor`      | String         | color of the button badge | `#FBC02D`  |
+| Key               | Type           | Description                                                                 | Default    |
+| :---------------- | -------------- | --------------------------------------------------------------------------- | ---------- |
+| `value`           | String, Number | selected button                                                             | `null`     |
+| `options`         | Array          | list of buttons                                                             | `required` |
+| `foregroundColor` | String         | color of the foreground                                                     | `#42A5F5`  |
+| `badgeColor`      | String         | color of the button badge                                                   | `#FBC02D`  |
+| `replaceRoute`    | Boolean        | default routes are pushed but with this option you can change it to replace | `false`    |
 
-Your options need `id` and `icon`, which is Font Awesome class.
+Your options need `id` and `icon`, which icon is **Font Awesome** class but you can customize it with icon slot.
 Additionally, you can add `title` for buttons.
-Also you can use **Icon Slot** , **Title Slot** , **Child Icon Slot** and **Child Title Slot** to customize your icon and title like below.
+
+## Route
+
+For change route you can add `path` field to your option items like below : <br />
+_Note_ : your path field must be an Object (For more information read [vue router](https://router.vuejs.org/guide/) guides).
+
+```js
+[
+  { id: 1, icon: "fas fa-home", title: "Home", path: { name: "home" } },
+  {
+    id: 2,
+    icon: "fas fa-wallet",
+    title: "Wallet",
+    childs: [
+      {
+        id: 201,
+        icon: "fas fa-bookmark",
+        title: "Bookmarks",
+        path: { name: "bookmarks", query: { bookmark: "important" } },
+      },
+    ],
+  },
+];
+```
+
+## Slots
+
+| Key           | Description        | Scoped |
+| :------------ | ------------------ | ------ |
+| `icon`        | main button icons  | `yes`  |
+| `title`       | main button titles | `yes`  |
+| `child-icon`  | child button icons | `yes`  |
+| `child-title` | child button title | `yes`  |
+
+You can use **Icon Slot** , **Title Slot** , **Child Icon Slot** and **Child Title Slot** to customize your icon and title like below.
 
 ```html
 <template>

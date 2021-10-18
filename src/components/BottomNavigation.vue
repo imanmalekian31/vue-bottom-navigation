@@ -38,7 +38,7 @@
               class="btn-child"
               v-for="(child, idx) in button.childs || []"
               :key="idx"
-              @click.stop="handleChildClick(child.id)"
+              @click.stop="handleChildClick(child)"
             >
               <slot name="child-icon" :props="child">
                 <i :class="`${child.icon}`" />
@@ -88,6 +88,10 @@ export default {
     badgeColor: {
       type: String,
       default: "#FBC02D",
+    },
+    replaceRoute: {
+      type: Boolean,
+      default: false,
     },
   },
   watch: {
@@ -220,19 +224,25 @@ export default {
         this.toggleClass();
       }
 
-      this.updateValue(button.id, this.hasChild(button));
+      this.updateValue(button, this.hasChild(button));
     },
-    handleChildClick(value) {
-      this.updateValue(value);
+    handleChildClick(button) {
+      this.updateValue(button);
       this.toggleClass();
     },
-    updateValue(value, prevent = false) {
+    updateValue(button, prevent = false) {
       this.localOptions.forEach(
-        (option) => (option.isActive = this.isActive(option, value))
+        (option) => (option.isActive = this.isActive(option, button.id))
       );
 
       if (!prevent) {
-        this.$emit("update", value);
+        this.$emit("update", button.id);
+
+        if (button.path && Object.keys(button.path).length) {
+          this.$router[!this.replaceRoute ? "push" : "replace"](
+            button.path
+          ).catch(() => {});
+        }
       }
     },
     toggleClass() {

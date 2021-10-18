@@ -89,6 +89,10 @@ export default {
       type: String,
       default: "#FBC02D",
     },
+    replaceRoute: {
+      type: Boolean,
+      default: false,
+    },
   },
   watch: {
     options: {
@@ -235,7 +239,9 @@ export default {
         this.$emit("update", button.id);
 
         if (button.path && Object.keys(button.path).length) {
-          this.$router.replace(button.path).catch(() => {});
+          this.$router[!this.replaceRoute ? "push" : "replace"](
+            button.path
+          ).catch(() => {});
         }
       }
     },

@@ -16,7 +16,7 @@
   ],
   "license": "MIT",
   "scripts": {
-    "serve": "vue-cli-service serve",
+    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build-library": "vue-cli-service build --target lib --name vue-bottom-navigation ./src/install.js",
     "lint": "vue-cli-service lint",

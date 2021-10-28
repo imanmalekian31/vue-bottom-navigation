@@ -32,11 +32,9 @@
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
     "eslint-plugin-vue": "^6.2.2",
-    "express": "^4.17.1",
-    "server-static": "^2.0.5",
+    "terser-webpack-plugin": "^3.0.8",
     "vue": "^2.6.14",
     "vue-router": "^3.5.2",
-    "terser-webpack-plugin": "^3.0.8",
     "vue-template-compiler": "^2.6.11"
   },
   "eslintConfig": {

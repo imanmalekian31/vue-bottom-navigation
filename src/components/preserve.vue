@@ -16,7 +16,7 @@
             {{ button.badge }}
           </div>
           <slot name="icon" :props="button">
-            <mdicon :name="`${button.icon}`" />
+            <i :class="`${button.icon}`" />
           </slot>
         </div>
 
@@ -41,7 +41,7 @@
               @click.stop="handleChildClick(child)"
             >
               <slot name="child-icon" :props="child">
-                <mdicon :name="`${child.icon}`" />
+                <i :class="`${child.icon}`" />
               </slot>
 
               <span class="btn-child-title">

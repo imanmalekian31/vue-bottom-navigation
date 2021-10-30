@@ -81,6 +81,7 @@ export default {
 
     foregroundColor: "#42A5F5",
     badgeColor: "#FBC02D",
+    iconColor: "red",
   }),
 };
 </script>

@@ -16,7 +16,7 @@
             {{ button.badge }}
           </div>
           <slot name="icon" :props="button">
-            <mdicon :name="`${button.icon}`" />
+            <mdicon style="color:red" :name="`${button.icon}`" />
           </slot>
         </div>
 
@@ -86,6 +86,10 @@ export default {
       type: String,
       default: "#42A5F5",
     },
+    iconColor: {
+      type: String,
+      default: "#6c757d",
+    },
     badgeColor: {
       type: String,
       default: "#FBC02D",
@@ -131,6 +135,7 @@ export default {
 
       const styles = {
         "--color-foreground": this.foregroundColor,
+        "--color-icon": this.iconColor,
         "--color-badge": this.badgeColor,
         "--width-parent": `${countChilds * 45}px`,
       };
@@ -184,9 +189,10 @@ export default {
         }
 
         .btn-item-${index}.checked ~ #sweep {
-          transform: translateX(${(index * containerWidth) /
-            this.options.length +
-            containerWidth / this.options.length / 4}px);
+          transform: translateX(${
+            (index * containerWidth) / this.options.length +
+            containerWidth / this.options.length / 4
+          }px);
           transition: transform 500ms ease;
         }
         `;
@@ -194,10 +200,12 @@ export default {
         if (this.hasChild(item)) {
           item.childs.forEach((child, idx) => {
             customStyle += `
-            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${idx +
-              1}) {
-              transform: translateX(${(0.5 + idx) * 45 -
-                (item.childs.length * 45) / 2}px);
+            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${
+              idx + 1
+            }) {
+              transform: translateX(${
+                (0.5 + idx) * 45 - (item.childs.length * 45) / 2
+              }px);
               transition: transform 500ms ease 300ms;
             }
           `;
@@ -318,7 +326,7 @@ input {
   position: absolute;
   top: 10px;
   background: #fff !important;
-  color: rgba(0, 0, 0, 0.54);
+  color:var(--color-icon);
 }
 
 .btn-title {
@@ -487,7 +495,10 @@ input {
 .unchecked .btn-child-parent {
   background: transparent;
 }
-
+/*icon color*/
+span [class*="mdi"] {
+  color: var(--color-icon);
+}
 .checked .btn-class-showable .btn-child-parent {
   animation: chil-background 500ms ease-in-out forwards;
 }

@@ -23,7 +23,10 @@
     "start": "node server.js"
   },
   "main": "src/install.js",
-  "dependencies": {},
+  "dependencies": {
+    "@mdi/js": "^6.4.95",
+    "mdi-vue": "^3.0.11"
+  },
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.15.4",
     "@vue/cli-plugin-babel": "~4.5.0",

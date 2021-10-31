@@ -6,30 +6,23 @@
     "name": "Iman Malekian",
     "email": "imanmalekian@gmail.com"
   },
-  "repository": "https://github.com/imanmalekian31/vue-bottom-navigation",
-  "bugs": "https://github.com/imanmalekian31/vue-bottom-navigation/issues",
-  "keywords": [
-    "vue",
-    "bottom",
-    "navigation",
-    "custom"
-  ],
-  "license": "MIT",
   "scripts": {
-    "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-library": "vue-cli-service build --target lib --name vue-bottom-navigation ./src/install.js",
     "lint": "vue-cli-service lint",
+    "build-library": "vue-cli-service build --target lib --name vue-bottom-navigation ./src/install.js",
+    "dev": "vue-cli-service serve",
     "start": "node server.js"
   },
   "main": "src/install.js",
   "dependencies": {
     "@mdi/js": "^6.4.95",
-    "mdi-vue": "^3.0.11"
+    "mdi-vue": "^3.0.11",
+    "vue-router": "^3.2.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "~4.5.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
+    "@vue/cli-plugin-router": "~4.5.0",
     "@vue/cli-service": "~4.5.0",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.7.2",
@@ -57,5 +50,14 @@
     "> 1%",
     "last 2 versions",
     "not dead"
-  ]
+  ],
+  "bugs": "https://github.com/imanmalekian31/vue-bottom-navigation/issues",
+  "keywords": [
+    "vue",
+    "bottom",
+    "navigation",
+    "custom"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/imanmalekian31/vue-bottom-navigation"
 }

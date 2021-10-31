@@ -8,6 +8,7 @@ Vue.use(VueRouter)
 Vue.config.productionTip = false;
 import mdiVue from 'mdi-vue/v2'
 import * as mdijs from '@mdi/js'
+import router from './router'
 
 
 Vue.use(mdiVue, {
@@ -16,5 +17,6 @@ Vue.use(mdiVue, {
 
 
 new Vue({
-  render: (h) => h(App),
+  router,
+  render: (h) => h(App)
 }).$mount("#app");

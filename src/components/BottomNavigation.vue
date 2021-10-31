@@ -11,14 +11,14 @@
         }"
         @click="handleLabelClick(button)"
       >
-        <div class="active-label">
+        <router-link :to="button.route" class="active-label">
           <div class="btn-badge" v-if="button.badge">
             {{ button.badge }}
           </div>
           <slot name="icon" :props="button">
-            <mdicon style="color:red" :name="`${button.icon}`" />
+            <mdicon class="text-muted" :name="`${button.icon}`" />
           </slot>
-        </div>
+        </router-link>
 
         <div class="btn-title">
           <slot name="title" :props="button">
@@ -296,14 +296,15 @@ input {
 
 .btn-containrt_foreground {
   position: fixed;
-  direction: ltr;
   display: flex;
-  align-items: flex-end;
-  bottom: 0;
-  width: 100%;
-  z-index: 2147483647;
+  bottom: -5px;
+  left: 0;
+  width: 100vw;
+  margin: 0 auto;
+  z-index: 1005;
   height: 60px;
   background: var(--color-foreground);
+  overflow: scroll;
 }
 
 .btn-containrt {
@@ -324,9 +325,9 @@ input {
   align-items: center;
   transition: all 300ms ease;
   position: absolute;
-  top: 10px;
+  top: 17px;
   background: #fff !important;
-  color:var(--color-icon);
+  color: var(--color-icon);
 }
 
 .btn-title {
@@ -540,5 +541,9 @@ input {
     width: 100%;
     height: 40px;
   }
+}
+
+.text-muted {
+  color: var(--bs-gray-500) !important;
 }
 </style>

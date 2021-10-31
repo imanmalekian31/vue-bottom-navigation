@@ -52,37 +52,33 @@ export default {
   data: () => ({
     selected: 1,
     options: [
+      { id: 1, icon: "npm", title: "npm", route: "https://www.npmjs.com/" },
       {
-        id: 1,
-        icon: "home",
-        title: "Home",
-        childs: [
-          { id: 101, icon: "tshirt-crew", title: "Products" },
-          { id: 102, icon: "tag", title: "Discount" },
-          { id: 103, icon: "gift", title: "Gifts", badge: 7 },
-        ],
+        id: 2,
+        icon: "google",
+        title: "google",
+        route: "https://www.google.com/",
       },
-      { id: 2, icon: "wallet", title: "Wallet" },
       {
         id: 3,
-        icon: "cog",
-        title: "Setting",
-        childs: [
-          { id: 301, icon: "tag-arrow-down-outline", title: "Bookmarks" },
-          { id: 302, icon: "clipboard-list", title: "Tasks" },
-          { id: 303, icon: "view-dashboard", title: "Dashboard" },
-          { id: 304, icon: "ticket", title: "Tickets" },
-          { id: 305, icon: "handshake", title: "Contract" },
-        ],
+        icon: "twitter",
+        title: "Twitter",
+        route: "https://twitter.com",
       },
-      { id: 4, icon: "bell", title: "Notifcation", badge: 15 },
-      { id: 5, icon: "account-circle", title: "Account" },
+      {
+        id: 4,
+        icon: "linkedin",
+        title: "linkedin",
+        badge: 15,
+        route: "https://www.linkedin.com/login",
+      },
+      { id: 5, icon: "account-circle", title: "Account", route: "/home" },
     ],
-    
+
     iconColor: "red",
     foregroundColor: "#42A5F5",
     badgeColor: "#FBC02D",
-  })
+  }),
 };
 </script>
 

@@ -78,11 +78,11 @@ export default {
       { id: 4, icon: "bell", title: "Notifcation", badge: 15 },
       { id: 5, icon: "account-circle", title: "Account" },
     ],
-
+    
+    iconColor: "red",
     foregroundColor: "#42A5F5",
     badgeColor: "#FBC02D",
-    iconColor: "red",
-  }),
+  })
 };
 </script>
 

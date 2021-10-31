@@ -495,10 +495,7 @@ input {
 .unchecked .btn-child-parent {
   background: transparent;
 }
-/*icon color*/
-span [class*="mdi"] {
-  color: var(--color-icon);
-}
+
 .checked .btn-class-showable .btn-child-parent {
   animation: chil-background 500ms ease-in-out forwards;
 }

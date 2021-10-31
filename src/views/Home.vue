@@ -1,15 +1,6 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
+  <div id="btn-app">
+    <h1>Vue Bottom Navigation</h1>
+    home page
   </div>
 </template>
-
-<script>
-// @ is an alias to /src
-
-export default {
-  name: 'Home',
-  components: {
-  }
-}
-</script>

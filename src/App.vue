@@ -1,39 +1,6 @@
 <template>
-  <div id="btn-app">
-    <h1>Vue Bottom Navigation</h1>
-    <a
-      href="https://github.com/imanmalekian31/vue-bottom-navigation"
-      target="blank"
-    >
-      <img width="40" height="40" :src="require('./assets/github-logo.png')" />
-    </a>
-
-    <div>
-      <div class="color-picker-container">
-        <span>Foreground</span>
-        <input
-          type="color"
-          name="foreground"
-          value="#42A5F5"
-          id="foreground"
-          v-model="foregroundColor"
-        />
-        <span class="pick-color">{{ foregroundColor }}</span>
-      </div>
-
-      <div class="color-picker-container">
-        <span>Badge</span>
-        <input
-          type="color"
-          id="badge"
-          name="badge"
-          value="#FBC02D"
-          v-model="badgeColor"
-        />
-        <span class="pick-color">{{ badgeColor }}</span>
-      </div>
-    </div>
-
+<div>
+  <router-view/>
     <BottomNavigation
       :options="options"
       :badge-color="badgeColor"
@@ -45,36 +12,34 @@
 
 <script>
 import BottomNavigation from "./components/BottomNavigation";
-
 export default {
   name: "App",
   components: { BottomNavigation },
   data: () => ({
     selected: 1,
     options: [
-      { id: 1, icon: "npm", title: "npm", route: "https://www.npmjs.com/" },
+      { id: 1, icon: "home", title: "Home", route: "/" },
       {
         id: 2,
-        icon: "google",
-        title: "google",
-        route: "https://www.google.com/",
+        icon: "bell-outline",
+        title: "Notifcation",
+        badge: 15,
+        route: "/notification",
       },
       {
         id: 3,
-        icon: "twitter",
-        title: "Twitter",
-        route: "https://twitter.com",
+        icon: "cog-outline",
+        title: "Setting",
+        route: "/settings",
       },
+
       {
         id: 4,
-        icon: "linkedin",
-        title: "linkedin",
-        badge: 15,
-        route: "https://www.linkedin.com/login",
+        icon: "account-circle",
+        title: "Account",
+        route: "/profile",
       },
-      { id: 5, icon: "account-circle", title: "Account", route: "/home" },
     ],
-
     iconColor: "red",
     foregroundColor: "#42A5F5",
     badgeColor: "#FBC02D",

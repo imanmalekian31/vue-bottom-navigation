@@ -75,7 +75,7 @@ export default {
           { id: 305, icon: "fas fa-file-signature", title: "Contract" },
         ],
       },
-      { id: 4, icon: "fas fa-bell", title: "Notifcation", badge: 15 },
+      { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
       { id: 5, icon: "fas fa-user", title: "Account" },
     ],
 

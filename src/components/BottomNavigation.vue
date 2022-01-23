@@ -1,6 +1,6 @@
 <template>
-  <div class="btn-containrt_foreground" :style="cssVariables">
-    <div class="btn-containrt">
+  <div class="btn-container_foreground" :style="cssVariables">
+    <div class="btn-container">
       <div
         v-for="(button, index) in localOptions"
         :key="`label-${index}`"
@@ -29,7 +29,7 @@
         <div
           v-if="hasChild(button)"
           :class="{
-            ['btn-super-parant']: button.isActive,
+            ['btn-super-parent']: button.isActive,
             ['btn-class-showable']: showable,
           }"
         >
@@ -149,7 +149,7 @@ export default {
     cssLoader() {
       let customStyle = "";
       const containerWidth =
-        document.querySelector(".btn-containrt").offsetWidth ||
+        document.querySelector(".btn-container").offsetWidth ||
         window.innerWidth;
 
       this.options.forEach((item, index) => {
@@ -184,9 +184,10 @@ export default {
         }
 
         .btn-item-${index}.checked ~ #sweep {
-          transform: translateX(${(index * containerWidth) /
-            this.options.length +
-            containerWidth / this.options.length / 4}px);
+          transform: translateX(${
+            (index * containerWidth) / this.options.length +
+            containerWidth / this.options.length / 4
+          }px);
           transition: transform 500ms ease;
         }
         `;
@@ -194,10 +195,12 @@ export default {
         if (this.hasChild(item)) {
           item.childs.forEach((child, idx) => {
             customStyle += `
-            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${idx +
-              1}) {
-              transform: translateX(${(0.5 + idx) * 45 -
-                (item.childs.length * 45) / 2}px);
+            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${
+              idx + 1
+            }) {
+              transform: translateX(${
+                (0.5 + idx) * 45 - (item.childs.length * 45) / 2
+              }px);
               transition: transform 500ms ease 300ms;
             }
           `;
@@ -271,7 +274,7 @@ export default {
 </script>
 
 <style scoped>
-.btn-super-parant {
+.btn-super-parent {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -286,7 +289,7 @@ input {
   display: none;
 }
 
-.btn-containrt_foreground {
+.btn-container_foreground {
   position: fixed;
   direction: ltr;
   display: flex;
@@ -298,7 +301,7 @@ input {
   background: var(--color-foreground);
 }
 
-.btn-containrt {
+.btn-container {
   direction: ltr;
   display: flex;
   justify-content: space-around;

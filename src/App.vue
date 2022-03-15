@@ -35,22 +35,48 @@
     </div>
 
     <BottomNavigation
+      v-show="false"
       :options="options"
       :badge-color="badgeColor"
       :foreground-color="foregroundColor"
       v-model="selected"
     />
+
+    <GrowBottomNavigation :color="foregroundColor" :options="growOptions" />
   </div>
 </template>
 
 <script>
 import BottomNavigation from "./components/BottomNavigation";
+import GrowBottomNavigation from "./components/GrowBottomNavigation";
 
 export default {
   name: "App",
-  components: { BottomNavigation },
+  components: { BottomNavigation, GrowBottomNavigation },
   data: () => ({
     selected: 1,
+    growOptions: [
+      {
+        id: 1,
+        icon: "fa-solid fa-home",
+        title: "Home",
+        color: "#5639af",
+      },
+      {
+        id: 2,
+        icon: "fa-solid fa-magnifying-glass",
+        title: "Search",
+        color: "#ac4793",
+      },
+      {
+        id: 3,
+        icon: "fa-solid fa-heart",
+        title: "Likes",
+        color: "#e2a93a",
+      },
+      // { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
+      { id: 5, icon: "fa-solid fa-gear", title: "Settings", color: "#4493a7" },
+    ],
     options: [
       {
         id: 1,
@@ -79,7 +105,7 @@ export default {
       { id: 5, icon: "fas fa-user", title: "Account" },
     ],
 
-    foregroundColor: "#42A5F5",
+    foregroundColor: "#ac4793",
     badgeColor: "#FBC02D",
   }),
 };

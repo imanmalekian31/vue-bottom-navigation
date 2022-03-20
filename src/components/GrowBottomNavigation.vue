@@ -3,42 +3,33 @@
     <div
       v-for="(button, index) in localOptions"
       :key="index"
-      :class="{ ['btn-item']: true, ['btn-item-active']: button.selected }"
+      :class="['btn-item', { 'btn-item-active': button.selected }]"
       @click="handleButtonClick(index)"
     >
       <div
-        :class="{
-          ['btn-container']: true,
-          ['btn-container-active']: button.selected,
-        }"
+        :class="['btn-container', { 'btn-container-active': button.selected }]"
       >
-        <div
-          :class="{
-            ['btn-icon']: true,
-            ['btn-icon-active']: button.selected,
-          }"
-        >
-          <i :class="`${button.icon}`" />
+        <div :class="['btn-icon', { 'btn-icon-active': button.selected }]">
+          <slot name="icon" :props="button">
+            <i :class="`${button.icon}`" />
+          </slot>
         </div>
-        <div :class="{ ['btn-title']: true }">
+        <div class="btn-title">
           <span class="hidden-title">
-            {{ button.title }}
+            <slot name="title" :props="button">
+              {{ button.title }}
+            </slot>
           </span>
           <span
-            :class="{
-              ['animated-title']: true,
-              ['animated-title-active']: button.selected,
-            }"
+            :class="[
+              'animated-title',
+              { 'animated-title-active': button.selected },
+            ]"
           >
-            {{ button.title }}
+            <slot name="title" :props="button">
+              {{ button.title }}
+            </slot>
           </span>
-          <div
-            v-if="true"
-            :class="{
-              ['btn-bottom-line']: true,
-              ['btn-bottom-line-active']: button.selected,
-            }"
-          ></div>
         </div>
       </div>
     </div>
@@ -151,13 +142,14 @@ export default {
   width: var(--active-width);
 }
 
-.btn-container-active i {
-  color: var(--color);
-}
-
 .btn-icon {
   font-size: 20px;
   transition: all 0.3s ease;
+  margin: 0px !important;
+}
+
+.btn-icon-active {
+  color: var(--color);
 }
 
 .btn-title {
@@ -165,6 +157,9 @@ export default {
   color: var(--color);
   padding: 0px 5px;
   margin-left: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .hidden-title {
@@ -176,23 +171,10 @@ export default {
   position: absolute;
   left: 5px;
   bottom: -15px;
-  transition: all 0.4s ease 0.1s;
+  transition: bottom 0.4s ease 0.1s;
 }
 
 .animated-title-active {
-  bottom: 5px;
-}
-
-.btn-bottom-line {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  height: 2px;
-  background-color: var(--color);
-  transition: all 0.3s ease;
-}
-
-.btn-bottom-line-active {
-  width: 100%;
+  bottom: 2px;
 }
 </style>

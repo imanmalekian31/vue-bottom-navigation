@@ -60,22 +60,30 @@ export default {
         id: 1,
         icon: "fa-solid fa-home",
         title: "Home",
+        gIcon: "home",
         color: "#5639af",
       },
       {
         id: 2,
         icon: "fa-solid fa-magnifying-glass",
         title: "Search",
+        gIcon: "home",
         color: "#ac4793",
       },
       {
         id: 3,
         icon: "fa-solid fa-heart",
         title: "Likes",
+        gIcon: "favorite_border",
         color: "#e2a93a",
       },
-      // { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
-      { id: 5, icon: "fa-solid fa-gear", title: "Settings", color: "#4493a7" },
+      {
+        id: 5,
+        icon: "fa-solid fa-gear",
+        title: "Settings",
+        gIcon: "settings",
+        color: "#4493a7",
+      },
     ],
     options: [
       {
@@ -111,7 +119,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 #btn-app {
   display: flex;
   flex-direction: column;

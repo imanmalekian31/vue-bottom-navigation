@@ -32,12 +32,38 @@
         />
         <span class="pick-color">{{ badgeColor }}</span>
       </div>
+      
+      <div class="color-picker-container">
+        <span>Background</span>
+        <input
+          type="color"
+          id="background"
+          name="background"
+          value="#FFFFFF"
+          v-model="backgroundColor"
+        />
+        <span class="pick-color">{{ backgroundColor }}</span>
+      </div>
+
+      <div class="color-picker-container">
+        <span>Icon</span>
+        <input
+          type="color"
+          id="icon"
+          name="icon"
+          value="#0000008A"
+          v-model="iconColor"
+        />
+        <span class="pick-color">{{ iconColor }}</span>
+      </div>
     </div>
 
     <BottomNavigation
       :options="options"
       :badge-color="badgeColor"
       :foreground-color="foregroundColor"
+      :background-color="backgroundColor"
+      :icon-color="iconColor"
       v-model="selected"
     />
   </div>
@@ -81,6 +107,8 @@ export default {
 
     foregroundColor: "#42A5F5",
     badgeColor: "#FBC02D",
+    backgroundColor:"#FFFFFF",
+    iconColor: "#0000008A",
   }),
 };
 </script>

@@ -86,6 +86,14 @@ export default {
       type: String,
       default: "#42A5F5",
     },
+    backgroundColor: {
+      type: String,
+      default: "#FFFFFF",
+    },
+    iconColor: {
+      type: String,
+      default: "#0000008A",
+    },
     badgeColor: {
       type: String,
       default: "#FBC02D",
@@ -131,6 +139,8 @@ export default {
 
       const styles = {
         "--color-foreground": this.foregroundColor,
+        "--color-background": this.backgroundColor,
+        "--color-icon": this.iconColor,
         "--color-badge": this.badgeColor,
         "--width-parent": `${countChilds * 45}px`,
       };
@@ -305,7 +315,7 @@ input {
   direction: ltr;
   display: flex;
   justify-content: space-around;
-  background-color: #fff;
+  background-color: var(--color-background);
   width: 100%;
   height: 55px;
 }
@@ -320,13 +330,13 @@ input {
   transition: all 300ms ease;
   position: absolute;
   top: 10px;
-  background: #fff !important;
-  color: rgba(0, 0, 0, 0.54);
+  background: var(--color-background) !important;
+  color: var(--color-icon);
 }
 
 .btn-title {
   position: absolute;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--color-icon);
   font-size: 10px;
 }
 
@@ -472,12 +482,12 @@ input {
   height: 30px;
   width: 30px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--color-background);
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  color: rgba(0, 0, 0, 0.54);
+  color: var(--color-icon);
 }
 
 .btn-child-title {
@@ -492,7 +502,7 @@ input {
 }
 
 .checked .btn-class-showable .btn-child-parent {
-  animation: chil-background 500ms ease-in-out forwards;
+  animation: child-background 500ms ease-in-out forwards;
 }
 
 .checked .btn-class-showable .btn-child-title {
@@ -512,7 +522,7 @@ input {
   }
 }
 
-@keyframes chil-background {
+@keyframes child-background {
   0% {
     bottom: -30px;
     background: transparent;

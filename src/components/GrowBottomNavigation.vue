@@ -1,29 +1,32 @@
 <template>
-  <div class="btn-container-foreground" :style="cssVariables">
+  <div class="gr-btn-container-foreground" :style="cssVariables">
     <div
       v-for="(button, index) in localOptions"
       :key="`grow-button-${index}`"
-      :class="['btn-item', { 'btn-item-active': button.selected }]"
+      :class="[
+        'gr-btn-container',
+        { 'gr-btn-container-active': button.selected },
+      ]"
       @click="handleButtonClick(button, index)"
     >
-      <div
-        :class="['btn-container', { 'btn-container-active': button.selected }]"
-      >
-        <div :class="['btn-icon', { 'btn-icon-active': button.selected }]">
+      <div :class="['gr-btn-item', { 'gr-btn-item-active': button.selected }]">
+        <div
+          :class="['gr-btn-icon', { 'gr-btn-icon-active': button.selected }]"
+        >
           <slot name="icon" :props="button">
             <i :class="`${button.icon}`" />
           </slot>
         </div>
-        <div class="btn-title">
-          <span class="hidden-title">
+        <div class="gr-btn-title">
+          <span class="gr-hidden-title">
             <slot name="title" :props="button">
               {{ button.title }}
             </slot>
           </span>
           <span
             :class="[
-              'animated-title',
-              { 'animated-title-active': button.selected },
+              'gr-animated-title',
+              { 'gr-animated-title-active': button.selected },
             ]"
           >
             <slot name="title" :props="button">
@@ -89,7 +92,8 @@ export default {
 
     const index = this.localOptions.findIndex(
       (item) =>
-        item.id == this.value || (item.path || {}).name == (this.$route || {}).name
+        item.id == this.value ||
+        (item.path || {}).name == (this.$route || {}).name
     );
 
     if (index > -1) {
@@ -132,7 +136,7 @@ export default {
 </script>
 
 <style scoped>
-.btn-container-foreground {
+.gr-btn-container-foreground {
   position: fixed;
   direction: ltr;
   display: flex;
@@ -145,7 +149,7 @@ export default {
   box-shadow: 0 0 5px 0 #eee;
 }
 
-.btn-item {
+.gr-btn-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -155,17 +159,17 @@ export default {
 }
 
 @media (min-width: 576px) {
-  .btn-item {
+  .gr-btn-container {
     cursor: pointer;
   }
 }
 
-.btn-item-active {
+.gr-btn-container-active {
   background-color: var(--color-background);
   border-radius: 100px;
 }
 
-.btn-container {
+.gr-btn-item {
   display: flex;
   position: relative;
   overflow: hidden;
@@ -174,21 +178,21 @@ export default {
   color: #0000008a;
 }
 
-.btn-container-active {
+.gr-btn-item-active {
   width: var(--active-width);
 }
 
-.btn-icon {
+.gr-btn-icon {
   font-size: 20px;
   transition: all 0.3s ease;
   margin: 0px !important;
 }
 
-.btn-icon-active {
+.gr-btn-icon-active {
   color: var(--color);
 }
 
-.btn-title {
+.gr-btn-title {
   position: relative;
   color: var(--color);
   padding: 0px 5px;
@@ -198,11 +202,11 @@ export default {
   align-items: center;
 }
 
-.hidden-title {
+.gr-hidden-title {
   visibility: hidden;
 }
 
-.animated-title {
+.gr-animated-title {
   color: var(--color);
   position: absolute;
   left: 5px;
@@ -210,7 +214,7 @@ export default {
   transition: bottom 0.4s ease 0.1s;
 }
 
-.animated-title-active {
+.gr-animated-title-active {
   bottom: 2px;
 }
 </style>

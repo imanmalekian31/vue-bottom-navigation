@@ -1,6 +1,6 @@
 # vue-bottom-navigation
 
-> ⚠️ **In version > 2 we have many bottom navigations with basic structure that they have individual options**: Be very careful here!
+> ⚠️ **In version > 2 we have many bottom navigations with basic structure but they have individual options**
 
 [Documents](https://iman-vue-bottom-navigation.herokuapp.com/)
 

@@ -2,19 +2,19 @@
 
 > ⚠️ **In version > 2 we have many bottom navigations with basic structure but they have individual options**
 
-[Documents](https://iman-vue-bottom-navigation.herokuapp.com/)
+[Documents](https://vue-bottom-navigation.herokuapp.com/)
 
-[Demos](https://iman-vue-bottom-navigation.herokuapp.com/navigations/)
+[Demos](https://vue-bottom-navigation.herokuapp.com/navigations/)
 
 ## Curved bottom navigation
 
-- [**Installation**](https://iman-vue-bottom-navigation.herokuapp.com/guide/curved)
-- [**Demo**](https://iman-vue-bottom-navigation.herokuapp.com/navigations/curved)
+- [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/curved)
+- [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/curved)
 
 ## Grow bottom navigation
 
-- [**Installation**](https://iman-vue-bottom-navigation.herokuapp.com/guide/grow)
-- [**Demo**](https://iman-vue-bottom-navigation.herokuapp.com/navigations/grow)
+- [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/grow)
+- [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/grow)
 
 # License
 

@@ -2,9 +2,9 @@
   <div class="btn-container-foreground" :style="cssVariables">
     <div
       v-for="(button, index) in localOptions"
-      :key="index"
+      :key="`grow-button-${index}`"
       :class="['btn-item', { 'btn-item-active': button.selected }]"
-      @click="handleButtonClick(index)"
+      @click="handleButtonClick(button, index)"
     >
       <div
         :class="['btn-container', { 'btn-container-active': button.selected }]"
@@ -38,7 +38,14 @@
 
 <script>
 export default {
+  model: {
+    prop: "value",
+    event: "update",
+  },
   props: {
+    value: {
+      default: null,
+    },
     options: {
       type: Array,
       default: () => [],
@@ -47,21 +54,22 @@ export default {
       type: String,
       default: "#74cbbb",
     },
+    replaceRoute: {
+      type: Boolean,
+      default: false,
+    },
   },
   data: () => ({
     prevSelected: null,
     currSelected: null,
     localOptions: [],
   }),
-  created() {
-    this.localOptions = this.options.slice();
-  },
   computed: {
     cssVariables() {
       const activeTitle = (this.localOptions[this.currSelected] || {}).title;
-      let activeWidth = 90;
+      let activeWidth = 95;
       if (activeTitle && activeTitle.length * 15 > 110) {
-        activeWidth = 90 + (activeTitle.length * 15 - 110) / 2;
+        activeWidth = 95 + (activeTitle.length * 15 - 110) / 2;
       }
 
       const mainColor =
@@ -76,8 +84,26 @@ export default {
       return styles;
     },
   },
+  created() {
+    this.localOptions = this.options.slice();
+
+    const index = this.localOptions.findIndex(
+      (item) =>
+        item.id == this.value || (item.path || {}).name == (this.$route || {}).name
+    );
+
+    if (index > -1) {
+      this.currSelected = index;
+      this.prevSelected = index;
+
+      this.$set(this.localOptions, index, {
+        ...this.localOptions[index],
+        selected: true,
+      });
+    }
+  },
   methods: {
-    handleButtonClick(index) {
+    handleButtonClick(button, index) {
       this.currSelected = index;
 
       if (this.prevSelected !== null) {
@@ -90,6 +116,16 @@ export default {
       });
 
       this.prevSelected = this.currSelected;
+      this.updateValue(button);
+    },
+    updateValue(button) {
+      this.$emit("update", button.id);
+
+      if (button.path && Object.keys(button.path).length) {
+        this.$router[!this.replaceRoute ? "push" : "replace"](
+          button.path
+        ).catch(() => {});
+      }
     },
   },
 };

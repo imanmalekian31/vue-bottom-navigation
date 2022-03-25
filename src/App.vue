@@ -58,7 +58,8 @@
       </div>
     </div>
 
-    <BottomNavigation
+    <CurvedBottomNavigation
+      v-show="false"
       :options="options"
       :badge-color="badgeColor"
       :foreground-color="foregroundColor"
@@ -66,15 +67,18 @@
       :icon-color="iconColor"
       v-model="selected"
     />
+
+    <GrowBottomNavigation :color="foregroundColor" :options="options" />
   </div>
 </template>
 
 <script>
-import BottomNavigation from "./components/BottomNavigation";
+import CurvedBottomNavigation from "./components/CurvedBottomNavigation";
+import GrowBottomNavigation from "./components/GrowBottomNavigation";
 
 export default {
   name: "App",
-  components: { BottomNavigation },
+  components: { CurvedBottomNavigation, GrowBottomNavigation },
   data: () => ({
     selected: 1,
     options: [
@@ -82,17 +86,19 @@ export default {
         id: 1,
         icon: "fas fa-home",
         title: "Home",
+        color: "#5639af",
         childs: [
           { id: 101, icon: "fas fa-tshirt", title: "Products" },
           { id: 102, icon: "fas fa-tag", title: "Discount" },
           { id: 103, icon: "fas fa-gifts", title: "Gifts", badge: 7 },
         ],
       },
-      { id: 2, icon: "fas fa-wallet", title: "Wallet" },
+      { id: 2, icon: "fas fa-wallet", title: "Wallet" ,  color: "#ac4793"},
       {
         id: 3,
         icon: "fas fa-plus",
         title: "Setting",
+        color: "#e2a93a",
         childs: [
           { id: 301, icon: "fas fa-bookmark", title: "Bookmarks" },
           { id: 302, icon: "fas fa-tasks", title: "Tasks" },
@@ -101,11 +107,11 @@ export default {
           { id: 305, icon: "fas fa-file-signature", title: "Contract" },
         ],
       },
-      { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 },
+      { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 , color: "#4493a7", },
       { id: 5, icon: "fas fa-user", title: "Account" },
     ],
 
-    foregroundColor: "#42A5F5",
+    foregroundColor: "#ac4793",
     badgeColor: "#FBC02D",
     backgroundColor:"#FFFFFF",
     iconColor: "#0000008A",
@@ -113,7 +119,7 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
 #btn-app {
   display: flex;
   flex-direction: column;

@@ -338,6 +338,7 @@ input {
   position: absolute;
   color: var(--color-icon);
   font-size: 10px;
+  line-height: 1.15 !important;
 }
 
 .btn-badge {
@@ -495,6 +496,7 @@ input {
   opacity: 0;
   position: absolute;
   top: 37px;
+  line-height: 1.15 !important;
 }
 
 .unchecked .btn-child-parent {

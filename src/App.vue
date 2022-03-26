@@ -8,7 +8,7 @@
       <img width="40" height="40" :src="require('./assets/github-logo.png')" />
     </a>
 
-    <div>
+    <div v-if="false">
       <div class="color-picker-container">
         <span>Foreground</span>
         <input
@@ -32,7 +32,7 @@
         />
         <span class="pick-color">{{ badgeColor }}</span>
       </div>
-      
+
       <div class="color-picker-container">
         <span>Background</span>
         <input
@@ -59,7 +59,7 @@
     </div>
 
     <CurvedBottomNavigation
-      v-show="false"
+      v-if="false"
       :options="options"
       :badge-color="badgeColor"
       :foreground-color="foregroundColor"
@@ -68,17 +68,23 @@
       v-model="selected"
     />
 
-    <GrowBottomNavigation :color="foregroundColor" :options="options" />
+    <GrowBottomNavigation v-if="false" :color="foregroundColor" :options="options" />
+    <SwipeBottomNavigation v-if="true" v-model="selected" :options="options" />
   </div>
 </template>
 
 <script>
 import CurvedBottomNavigation from "./components/CurvedBottomNavigation";
 import GrowBottomNavigation from "./components/GrowBottomNavigation";
+import SwipeBottomNavigation from "./components/SwipeBottomNavigation";
 
 export default {
   name: "App",
-  components: { CurvedBottomNavigation, GrowBottomNavigation },
+  components: {
+    CurvedBottomNavigation,
+    GrowBottomNavigation,
+    SwipeBottomNavigation,
+  },
   data: () => ({
     selected: 1,
     options: [
@@ -93,7 +99,7 @@ export default {
           { id: 103, icon: "fas fa-gifts", title: "Gifts", badge: 7 },
         ],
       },
-      { id: 2, icon: "fas fa-wallet", title: "Wallet" ,  color: "#ac4793"},
+      { id: 2, icon: "fas fa-wallet", title: "Wallet", color: "#ac4793" },
       {
         id: 3,
         icon: "fas fa-plus",
@@ -107,13 +113,19 @@ export default {
           { id: 305, icon: "fas fa-file-signature", title: "Contract" },
         ],
       },
-      { id: 4, icon: "fas fa-bell", title: "Notification", badge: 15 , color: "#4493a7", },
+      {
+        id: 4,
+        icon: "fas fa-bell",
+        title: "Notification",
+        badge: 15,
+        color: "#4493a7",
+      },
       { id: 5, icon: "fas fa-user", title: "Account" },
     ],
 
     foregroundColor: "#ac4793",
     badgeColor: "#FBC02D",
-    backgroundColor:"#FFFFFF",
+    backgroundColor: "#FFFFFF",
     iconColor: "#0000008A",
   }),
 };

@@ -16,6 +16,11 @@
 - [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/grow)
 - [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/grow)
 
+## Swipe bottom navigation
+
+- [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/swipe)
+- [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/swipe)
+
 # License
 
 [The MIT License](http://opensource.org/licenses/MIT)

@@ -69,7 +69,8 @@
     />
 
     <GrowBottomNavigation v-if="false" :color="foregroundColor" :options="options" />
-    <SwipeBottomNavigation v-if="true" v-model="selected" :options="options" />
+    <SwipeBottomNavigation v-if="false" v-model="selected" :options="options" />
+    <RingBottomNavigation v-if="true" v-model="selected" :options="options" />
   </div>
 </template>
 
@@ -77,6 +78,7 @@
 import CurvedBottomNavigation from "./components/CurvedBottomNavigation";
 import GrowBottomNavigation from "./components/GrowBottomNavigation";
 import SwipeBottomNavigation from "./components/SwipeBottomNavigation";
+import RingBottomNavigation from "./components/RingBottomNavigation";
 
 export default {
   name: "App",
@@ -84,6 +86,7 @@ export default {
     CurvedBottomNavigation,
     GrowBottomNavigation,
     SwipeBottomNavigation,
+    RingBottomNavigation
   },
   data: () => ({
     selected: 1,

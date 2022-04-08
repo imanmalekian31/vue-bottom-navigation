@@ -1,6 +1,6 @@
 {
   "name": "bottom-navigation-vue",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "private": false,
   "author": {
     "name": "Iman Malekian",
@@ -12,15 +12,22 @@
     "vue",
     "bottom",
     "navigation",
-    "custom"
+    "custom",
+    "curved",
+    "swipe",
+    "ring",
+    "grow",
+    "bottom-navigation"
+  ],
+  "files": [
+    "src/"
   ],
   "license": "MIT",
   "scripts": {
     "dev": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "build-library": "vue-cli-service build --target lib --name vue-bottom-navigation ./src/install.js",
-    "lint": "vue-cli-service lint",
-    "start": "node server.js"
+    "lint": "vue-cli-service lint"
   },
   "main": "src/install.js",
   "devDependencies": {

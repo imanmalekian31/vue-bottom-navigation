@@ -1,5 +1,5 @@
 <template>
-  <div class="btn-container-foreground" :style="cssVariables">
+  <div class="sm-btn-container-foreground" :style="cssVariables">
     <div
       v-for="(button, index) in localOptions"
       :key="`simple-btn-${index}`"
@@ -151,7 +151,7 @@ export default {
 </script>
 
 <style scoped>
-.btn-container-foreground {
+.sm-btn-container-foreground {
   position: fixed;
   display: flex;
   align-items: flex-end;
@@ -171,6 +171,12 @@ export default {
   height: 100%;
   flex-basis: 100%;
   transition: all 0.3s;
+}
+
+@media (min-width: 576px) {
+  .sm-btn-container {
+    cursor: pointer;
+  }
 }
 
 .sm-btn-item {

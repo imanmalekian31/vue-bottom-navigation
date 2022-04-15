@@ -26,6 +26,11 @@
 - [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/ring)
 - [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/ring)
 
+## Windows bottom navigation
+
+- [**Installation**](https://vue-bottom-navigation.herokuapp.com/guide/windows)
+- [**Demo**](https://vue-bottom-navigation.herokuapp.com/navigations/windows)
+
 # License
 
 [The MIT License](http://opensource.org/licenses/MIT)

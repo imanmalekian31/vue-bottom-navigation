@@ -189,7 +189,7 @@ export default {
 }
 
 .wn-btn-icon-active {
-  animation: windows-button-selected 0.6s ease-out forwards;
+  animation: windows-button-selected 0.7s ease-out forwards;
 }
 
 .wn-btn-icon-deselect {
@@ -247,13 +247,16 @@ export default {
 
 @keyframes windows-button-selected {
   0% {
-    transform: scale(0.8);
-  }
-  40% {
     transform: scale(1);
   }
+  10% {
+    transform: scale(0.6);
+  }
+  40% {
+    transform: scale(1) translateY(-4px);
+  }
   60% {
-    transform: scale(1.2) translateY(-4px);
+    transform: scale(1.2);
   }
   80% {
     transform: scale(1.2) translateY(2px);
@@ -265,7 +268,7 @@ export default {
 
 @keyframes windows-button-deselect {
   0% {
-    transform: scale(0.8);
+    transform: scale(0.9);
   }
   100% {
     transform: scale(1);

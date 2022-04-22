@@ -7,12 +7,12 @@
         :class="{
           [`btn-item-${index} labels`]: true,
           ['checked']: button.isActive,
-          ['unchecked']: !button.isActive,
+          ['unchecked']: !button.isActive
         }"
         @click="handleLabelClick(button)"
       >
         <div class="active-label">
-          <div class="btn-badge" v-if="button.badge">
+          <div v-if="button.badge" class="btn-badge">
             {{ button.badge }}
           </div>
           <slot name="icon" :props="button">
@@ -30,14 +30,14 @@
           v-if="hasChild(button)"
           :class="{
             ['btn-super-parent']: button.isActive,
-            ['btn-class-showable']: showable,
+            ['btn-class-showable']: showable
           }"
         >
           <div class="btn-child-parent">
             <div
-              class="btn-child"
               v-for="(child, idx) in button.childs || []"
               :key="idx"
+              class="btn-child"
               @click.stop="handleChildClick(child)"
             >
               <slot name="child-icon" :props="child">
@@ -50,7 +50,7 @@
                 </slot>
               </span>
 
-              <div class="btn-child-badge" v-if="child.badge">
+              <div v-if="child.badge" class="btn-child-badge">
                 {{ child.badge }}
               </div>
             </div>
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <div id="sweep" v-show="hasActiveClass">
+      <div v-show="hasActiveClass" id="sweep">
         <div id="sweep-right" />
         <div id="sweep-center" />
         <div id="sweep-left" />
@@ -69,39 +69,65 @@
 
 <script>
 export default {
-  name: "VueBottomNavigation",
+  name: 'VueBottomNavigation',
   model: {
-    prop: "value",
-    event: "update",
+    prop: 'value',
+    event: 'update'
   },
   props: {
     value: {
-      default: null,
+      default: null
     },
     options: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     foregroundColor: {
       type: String,
-      default: "#42A5F5",
+      default: '#42A5F5'
     },
     backgroundColor: {
       type: String,
-      default: "#FFFFFF",
+      default: '#FFFFFF'
     },
     iconColor: {
       type: String,
-      default: "#0000008A",
+      default: '#0000008A'
     },
     badgeColor: {
       type: String,
-      default: "#FBC02D",
+      default: '#FBC02D'
     },
     replaceRoute: {
       type: Boolean,
-      default: false,
+      default: false
+    }
+  },
+  data: () => ({
+    localOptions: [],
+    showable: false,
+    enableWatch: true
+  }),
+  computed: {
+    cssVariables() {
+      const countChilds = (
+        (this.localOptions.find((option) => option.isActive) || {}).childs || []
+      ).length;
+
+      const styles = {
+        '--color-foreground': this.foregroundColor,
+        '--color-background': this.backgroundColor,
+        '--color-icon': this.iconColor,
+        '--color-badge': this.badgeColor,
+        '--width-parent': `${countChilds * 45}px`
+      };
+
+      return styles;
     },
+
+    hasActiveClass() {
+      return this.localOptions.some((option) => option.isActive);
+    }
   },
   watch: {
     options: {
@@ -110,56 +136,49 @@ export default {
         if (newVal) {
           this.localOptions = newVal.map((option) => ({
             ...option,
-            isActive: this.isActive(option),
+            isActive: this.isActive(option)
           }));
           this.cssLoader();
         }
-      },
+      }
     },
+    value: {
+      handler(newVal, oldVal) {
+        if (newVal != oldVal && this.enableWatch) {
+          const childs = [];
+          this.localOptions.forEach((option) => {
+            if (option.childs) {
+              childs.push(...option.childs);
+            }
+          });
+          const target = [...this.localOptions, ...childs].find(
+            (option) => option.id == newVal
+          );
+          if (target) {
+            this.updateValue(target, this.hasChild(target));
+          }
+        }
+      }
+    }
   },
-  data: () => ({
-    localOptions: [],
-    showable: false,
-  }),
   created() {
     this.localOptions = this.options.map((option) => ({
       ...option,
-      isActive: this.isActive(option),
+      isActive: this.isActive(option)
     }));
   },
   mounted() {
     this.cssLoader();
-    window.addEventListener("resize", this.onResize);
-  },
-  computed: {
-    cssVariables() {
-      const countChilds = (
-        (this.localOptions.find((option) => option.isActive) || {}).childs || []
-      ).length;
-
-      const styles = {
-        "--color-foreground": this.foregroundColor,
-        "--color-background": this.backgroundColor,
-        "--color-icon": this.iconColor,
-        "--color-badge": this.badgeColor,
-        "--width-parent": `${countChilds * 45}px`,
-      };
-
-      return styles;
-    },
-
-    hasActiveClass() {
-      return this.localOptions.some((option) => option.isActive);
-    },
+    window.addEventListener('resize', this.onResize);
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.onResize);
+    window.removeEventListener('resize', this.onResize);
   },
   methods: {
     cssLoader() {
-      let customStyle = "";
+      let customStyle = '';
       const containerWidth =
-        document.querySelector(".btn-container").offsetWidth ||
+        document.querySelector('.btn-container').offsetWidth ||
         window.innerWidth;
 
       this.options.forEach((item, index) => {
@@ -218,12 +237,12 @@ export default {
         }
       });
 
-      document.getElementById("sweep").style.left = `
+      document.getElementById('sweep').style.left = `
       ${containerWidth / this.options.length / 4 - 135 / 2}px`;
 
-      var head = document.getElementsByTagName("head")[0];
-      var style = document.createElement("style");
-      style.id = "bottom-navigation-style";
+      const head = document.getElementsByTagName('head')[0];
+      const style = document.createElement('style');
+      style.id = 'bottom-navigation-style';
 
       if (style.styleSheet) {
         style.styleSheet.cssText = customStyle;
@@ -250,10 +269,14 @@ export default {
       );
 
       if (!prevent) {
-        this.$emit("update", button.id);
+        this.$emit('update', button.id);
+        this.enableWatch = false;
+        setTimeout(() => {
+          this.enableWatch = true;
+        }, 0);
 
         if (button.path && Object.keys(button.path).length) {
-          this.$router[!this.replaceRoute ? "push" : "replace"](
+          this.$router[!this.replaceRoute ? 'push' : 'replace'](
             button.path
           ).catch(() => {});
         }
@@ -270,7 +293,7 @@ export default {
     },
     onResize() {
       this.$nextTick(() => {
-        const styleElement = document.getElementById("bottom-navigation-style");
+        const styleElement = document.getElementById('bottom-navigation-style');
         styleElement && styleElement.remove();
       });
 
@@ -278,8 +301,8 @@ export default {
     },
     hasChild(button) {
       return (button.childs || []).length;
-    },
-  },
+    }
+  }
 };
 </script>
 
@@ -400,7 +423,7 @@ input {
 }
 
 #sweep-left:before {
-  content: "";
+  content: '';
   display: block;
   width: 220%;
   height: 200%;
@@ -420,7 +443,7 @@ input {
 }
 
 #sweep-right:before {
-  content: "";
+  content: '';
   display: block;
   width: 220%;
   height: 200%;

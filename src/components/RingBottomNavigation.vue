@@ -10,14 +10,14 @@
         <div
           :class="[
             { 'rg-btn-border': button.selected },
-            { 'rg-btn-border-deselect': button.deselect },
+            { 'rg-btn-border-deselect': button.deselect }
           ]"
         />
         <div
           :class="[
             'rg-btn-icon',
             { 'rg-btn-icon-active': button.selected },
-            { 'rg-btn-icon-deselect': button.deselect },
+            { 'rg-btn-icon-deselect': button.deselect }
           ]"
         >
           <slot name="icon" :props="button">
@@ -81,76 +81,97 @@ export default {
   data: () => ({
     prevSelected: null,
     currSelected: null,
-    localOptions: []
+    localOptions: [],
+    enableWatch: true
   }),
   computed: {
-    cssVariables () {
+    cssVariables() {
       const styles = {
         '--border-color': this.borderColor,
         '--icon-color': this.iconColor,
         '--background-color': this.backgroundColor,
         '--title-color': this.titleColor,
         '--badge-color': this.badgeColor
-      }
+      };
 
-      return styles
+      return styles;
     }
   },
-  created () {
-    this.localOptions = this.options.slice()
+  watch: {
+    value: {
+      handler(newVal, oldVal) {
+        if (newVal != oldVal && this.enableWatch) {
+          const target = this.localOptions.findIndex(
+            (option) => option.id == newVal
+          );
+
+          if (target > -1) {
+            this.handleButtonClick(this.localOptions[target], target);
+          }
+        }
+      }
+    }
+  },
+  created() {
+    this.localOptions = this.options.slice();
 
     const index = this.localOptions.findIndex(
-      item =>
+      (item) =>
         item.id == this.value ||
         (item.path || {}).name == (this.$route || {}).name
-    )
+    );
 
     if (index > -1) {
-      this.currSelected = index
-      this.prevSelected = index
+      this.currSelected = index;
+      this.prevSelected = index;
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
         selected: true
-      })
+      });
     }
   },
   methods: {
-    handleButtonClick (button, index) {
+    handleButtonClick(button, index) {
       if (index === this.currSelected) {
-        return
+        return;
       }
 
-      this.currSelected = index
+      this.currSelected = index;
 
       if (this.prevSelected !== null) {
-        const temp = this.prevSelected
+        const temp = this.prevSelected;
         setTimeout(() => {
-          this.localOptions[temp].deselect = false
-        }, 100)
+          this.localOptions[temp].deselect = false;
+        }, 100);
 
-        this.localOptions[this.prevSelected].selected = false
-        this.localOptions[this.prevSelected].deselect = true
+        this.localOptions[this.prevSelected].selected = false;
+        this.localOptions[this.prevSelected].deselect = true;
       }
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
         selected: true
-      })
-      this.prevSelected = this.currSelected
-      this.updateValue(button)
+      });
+      this.prevSelected = this.currSelected;
+      this.updateValue(button);
     },
-    updateValue (button) {
-      this.$emit('update', button.id)
+    updateValue(button) {
+      this.$emit('update', button.id);
+
+      this.enableWatch = false;
+      setTimeout(() => {
+        this.enableWatch = true;
+      }, 0);
 
       if (button.path && Object.keys(button.path).length) {
         this.$router[!this.replaceRoute ? 'push' : 'replace'](
           button.path
-        ).catch(() => {})
+        ).catch(() => {});
       }
     }
   }
-}
+};
 </script>
 
 <style scoped>

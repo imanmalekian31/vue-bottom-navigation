@@ -5,7 +5,7 @@
       :key="`grow-button-${index}`"
       :class="[
         'gr-btn-container',
-        { 'gr-btn-container-active': button.selected },
+        { 'gr-btn-container-active': button.selected }
       ]"
       @click="handleButtonClick(button, index)"
     >
@@ -26,7 +26,7 @@
           <span
             :class="[
               'gr-animated-title',
-              { 'gr-animated-title-active': button.selected },
+              { 'gr-animated-title-active': button.selected }
             ]"
           >
             <slot name="title" :props="button">
@@ -42,30 +42,31 @@
 <script>
 export default {
   model: {
-    prop: "value",
-    event: "update",
+    prop: 'value',
+    event: 'update'
   },
   props: {
     value: {
-      default: null,
+      default: null
     },
     options: {
       type: Array,
-      default: () => [],
+      default: () => []
     },
     color: {
       type: String,
-      default: "#74cbbb",
+      default: '#74cbbb'
     },
     replaceRoute: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data: () => ({
     prevSelected: null,
     currSelected: null,
     localOptions: [],
+    enableWatch: true
   }),
   computed: {
     cssVariables() {
@@ -79,13 +80,28 @@ export default {
         (this.localOptions[this.currSelected] || {}).color || this.color;
 
       const styles = {
-        "--color": mainColor,
-        "--color-background": mainColor + "30",
-        "--active-width": `${activeWidth}px`,
+        '--color': mainColor,
+        '--color-background': mainColor + '30',
+        '--active-width': `${activeWidth}px`
       };
 
       return styles;
-    },
+    }
+  },
+  watch: {
+    value: {
+      handler(newVal, oldVal) {
+        if (newVal != oldVal && this.enableWatch) {
+          const target = this.localOptions.findIndex(
+            (option) => option.id == newVal
+          );
+
+          if (target > -1) {
+            this.handleButtonClick(this.localOptions[target], target);
+          }
+        }
+      }
+    }
   },
   created() {
     this.localOptions = this.options.slice();
@@ -102,7 +118,7 @@ export default {
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
-        selected: true,
+        selected: true
       });
     }
   },
@@ -116,22 +132,27 @@ export default {
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
-        selected: true,
+        selected: true
       });
 
       this.prevSelected = this.currSelected;
       this.updateValue(button);
     },
     updateValue(button) {
-      this.$emit("update", button.id);
+      this.$emit('update', button.id);
+
+      this.enableWatch = false;
+      setTimeout(() => {
+        this.enableWatch = true;
+      }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        this.$router[!this.replaceRoute ? "push" : "replace"](
+        this.$router[!this.replaceRoute ? 'push' : 'replace'](
           button.path
         ).catch(() => {});
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

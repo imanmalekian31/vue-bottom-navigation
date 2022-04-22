@@ -70,7 +70,8 @@ export default {
   data: () => ({
     prevSelected: null,
     currSelected: null,
-    localOptions: []
+    localOptions: [],
+    enableWatch: true
   }),
   computed: {
     cssVariables() {
@@ -81,6 +82,21 @@ export default {
       };
 
       return styles;
+    }
+  },
+  watch: {
+    value: {
+      handler(newVal, oldVal) {
+        if (newVal != oldVal && this.enableWatch) {
+          const target = this.localOptions.findIndex(
+            (option) => option.id == newVal
+          );
+
+          if (target > -1) {
+            this.handleButtonClick(this.localOptions[target], target);
+          }
+        }
+      }
     }
   },
   created() {
@@ -129,6 +145,11 @@ export default {
     },
     updateValue(button) {
       this.$emit('update', button.id);
+
+      this.enableWatch = false;
+      setTimeout(() => {
+        this.enableWatch = true;
+      }, 0);
 
       if (button.path && Object.keys(button.path).length) {
         this.$router[!this.replaceRoute ? 'push' : 'replace'](

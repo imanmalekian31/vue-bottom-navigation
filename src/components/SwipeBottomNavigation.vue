@@ -32,51 +32,52 @@
 <script>
 export default {
   model: {
-    prop: "value",
-    event: "update",
+    prop: 'value',
+    event: 'update'
   },
   props: {
     value: {
-      default: null,
+      default: null
     },
     options: {
       type: Array,
-      required: true,
+      required: true
     },
     backgroundColor: {
       type: String,
-      default: "#FFFFFF",
+      default: '#FFFFFF'
     },
     iconColor: {
       type: String,
-      default: "#8066C7",
+      default: '#8066C7'
     },
     swiperColor: {
       type: String,
-      default: "#8066C7",
+      default: '#8066C7'
     },
     replaceRoute: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data: () => ({
     prevSelected: null,
     currSelected: null,
     localOptions: [],
+    enableWatch: true,
 
-    btnItemWidth: 0,
+    btnItemWidth: 0
   }),
   computed: {
     cssVariables() {
       const styles = {
-        "--swiper-color": this.swiperColor,
-        "--icon-color": this.iconColor,
-        "--background-color": this.backgroundColor,
+        '--swiper-color': this.swiperColor,
+        '--icon-color': this.iconColor,
+        '--background-color': this.backgroundColor
       };
 
       return styles;
-    },
+    }
   },
   watch: {
     currSelected(newVal) {
@@ -84,13 +85,26 @@ export default {
         this.btnItemWidth * newVal
       }px)`;
     },
+    value: {
+      handler(newVal, oldVal) {
+        if (newVal != oldVal && this.enableWatch) {
+          const target = this.localOptions.findIndex(
+            (option) => option.id == newVal
+          );
+
+          if (target > -1) {
+            this.handleButtonClick(this.localOptions[target], target);
+          }
+        }
+      }
+    }
   },
   mounted() {
     this.cssLoader();
-    window.addEventListener("resize", this.onResize);
+    window.addEventListener('resize', this.onResize);
   },
   beforeDestroy() {
-    window.removeEventListener("resize", this.onResize);
+    window.removeEventListener('resize', this.onResize);
   },
   created() {
     this.localOptions = this.options.slice();
@@ -107,14 +121,14 @@ export default {
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
-        selected: true,
+        selected: true
       });
     }
   },
   methods: {
     cssLoader() {
       this.btnItemWidth = this.$refs.btnContainer[0].offsetWidth;
-      this.$refs.borderSwiper.style.width = this.btnItemWidth + "px";
+      this.$refs.borderSwiper.style.width = this.btnItemWidth + 'px';
       this.$refs.borderSwiper.style.transform = `translateX(${
         this.btnItemWidth * this.currSelected
       }px)`;
@@ -131,22 +145,27 @@ export default {
 
       this.$set(this.localOptions, index, {
         ...this.localOptions[index],
-        selected: true,
+        selected: true
       });
 
       this.prevSelected = this.currSelected;
       this.updateValue(button);
     },
     updateValue(button) {
-      this.$emit("update", button.id);
+      this.$emit('update', button.id);
+
+      this.enableWatch = false;
+      setTimeout(() => {
+        this.enableWatch = true;
+      }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        this.$router[!this.replaceRoute ? "push" : "replace"](
+        this.$router[!this.replaceRoute ? 'push' : 'replace'](
           button.path
         ).catch(() => {});
       }
-    },
-  },
+    }
+  }
 };
 </script>
 

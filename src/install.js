@@ -1,8 +1,8 @@
-import CurvedBottomNavigation from "./components/CurvedBottomNavigation";
-import GrowBottomNavigation from "./components/GrowBottomNavigation";
-import SwipeBottomNavigation from "./components/SwipeBottomNavigation";
-import RingBottomNavigation from "./components/RingBottomNavigation";
-import WindowsBottomNavigation from "./components/WindowsBottomNavigation";
+import CurvedBottomNavigation from "./components/CurvedBottomNavigation.vue";
+import GrowBottomNavigation from "./components/GrowBottomNavigation.vue";
+import SwipeBottomNavigation from "./components/SwipeBottomNavigation.vue";
+import RingBottomNavigation from "./components/RingBottomNavigation.vue";
+import WindowsBottomNavigation from "./components/WindowsBottomNavigation.vue";
 
 export {
   CurvedBottomNavigation,

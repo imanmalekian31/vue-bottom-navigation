@@ -112,10 +112,14 @@ export default {
       this.currSelected = index;
       this.prevSelected = index;
 
-      this.$set(this.localOptions, index, {
-        ...this.localOptions[index],
-        selected: true
-      });
+      if ('$set' in this) {
+        this.$set(this.localOptions, index, {
+          ...this.localOptions[index],
+          selected: true
+        });
+      } else {
+        this.localOptions[index].selected = true;
+      }
     }
   },
   methods: {
@@ -136,10 +140,15 @@ export default {
         this.localOptions[this.prevSelected].deselect = true;
       }
 
-      this.$set(this.localOptions, index, {
-        ...this.localOptions[index],
-        selected: true
-      });
+      if ('$set' in this) {
+        this.$set(this.localOptions, index, {
+          ...this.localOptions[index],
+          selected: true
+        });
+      } else {
+        this.localOptions[index].selected = true;
+      }
+
       this.prevSelected = this.currSelected;
       this.updateValue(button);
     },

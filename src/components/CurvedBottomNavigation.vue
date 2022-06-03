@@ -276,9 +276,11 @@ export default {
         }, 0);
 
         if (button.path && Object.keys(button.path).length) {
-          this.$router[!this.replaceRoute ? 'push' : 'replace'](
-            button.path
-          ).catch(() => {});
+          if (this.replaceRoute) {
+            this.$router.replace(button.path).catch(() => {});
+          } else {
+            this.$router.push(button.path);
+          }
         }
       }
     },

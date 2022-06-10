@@ -30,152 +30,154 @@
 </template>
 
 <script>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
-  model: {
-    prop: 'value',
-    event: 'update'
-  },
   props: {
-    value: {
-      default: null
+    modelValue: {
+      default: null,
     },
     options: {
       type: Array,
-      required: true
+      required: true,
     },
     backgroundColor: {
       type: String,
-      default: '#FFFFFF'
+      default: "#FFFFFF",
     },
     iconColor: {
       type: String,
-      default: '#8066C7'
+      default: "#8066C7",
     },
     swiperColor: {
       type: String,
-      default: '#8066C7'
+      default: "#8066C7",
     },
     replaceRoute: {
       type: Boolean,
-      default: false
-    }
-  },
-  data: () => ({
-    prevSelected: null,
-    currSelected: null,
-    localOptions: [],
-    enableWatch: true,
-
-    btnItemWidth: 0
-  }),
-  computed: {
-    cssVariables() {
-      const styles = {
-        '--swiper-color': this.swiperColor,
-        '--icon-color': this.iconColor,
-        '--background-color': this.backgroundColor
-      };
-
-      return styles;
-    }
-  },
-  watch: {
-    currSelected(newVal) {
-      this.$refs.borderSwiper.style.transform = `translateX(${
-        this.btnItemWidth * newVal
-      }px)`;
+      default: false,
     },
-    value: {
-      handler(newVal, oldVal) {
-        if (newVal != oldVal && this.enableWatch) {
-          const target = this.localOptions.findIndex(
+  },
+  setup(props, { emit }) {
+    const router = useRouter();
+    const route = useRoute();
+
+    const prevSelected = ref(null);
+    const currSelected = ref(null);
+    const localOptions = ref([]);
+    const enableWatch = ref(true);
+    const btnItemWidth = ref(0);
+    const borderSwiper = ref(null);
+    const btnContainer = ref(null);
+
+    const cssVariables = computed(() => ({
+      "--swiper-color": props.swiperColor,
+      "--icon-color": props.iconColor,
+      "--background-color": props.backgroundColor,
+    }));
+
+    watch(
+      () => currSelected.value,
+      (newVal) => {
+        if (borderSwiper.value) {
+          borderSwiper.value.style.transform = `translateX(${
+            btnItemWidth.value * newVal
+          }px)`;
+        }
+      }
+    );
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (newVal != oldVal && enableWatch.value) {
+          const target = localOptions.value.findIndex(
             (option) => option.id == newVal
           );
 
           if (target > -1) {
-            this.handleButtonClick(this.localOptions[target], target);
+            handleButtonClick(localOptions.value[target], target);
           }
         }
       }
-    }
-  },
-  mounted() {
-    this.cssLoader();
-    window.addEventListener('resize', this.onResize);
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.onResize);
-  },
-  created() {
-    this.localOptions = this.options.slice();
-
-    const index = this.localOptions.findIndex(
-      (item) =>
-        item.id == this.value ||
-        (item.path || {}).name == (this.$route || {}).name
     );
 
-    if (index > -1) {
-      this.currSelected = index;
-      this.prevSelected = index;
-
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
-    }
-  },
-  methods: {
-    cssLoader() {
-      this.btnItemWidth = this.$refs.btnContainer[0].offsetWidth;
-      this.$refs.borderSwiper.style.width = this.btnItemWidth + 'px';
-      this.$refs.borderSwiper.style.transform = `translateX(${
-        this.btnItemWidth * this.currSelected
+    function cssLoader() {
+      btnItemWidth.value = btnContainer.value[0].offsetWidth;
+      borderSwiper.value.style.width = btnItemWidth.value + "px";
+      borderSwiper.value.style.transform = `translateX(${
+        btnItemWidth.value * currSelected.value
       }px)`;
-    },
-    onResize() {
-      this.cssLoader();
-    },
-    handleButtonClick(button, index) {
-      this.currSelected = index;
+    }
+    function onResize() {
+      cssLoader();
+    }
 
-      if (this.prevSelected !== null) {
-        this.localOptions[this.prevSelected].selected = false;
+    function handleButtonClick(button, index) {
+      if (index === currSelected.value) {
+        return;
       }
 
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
+      currSelected.value = index;
+
+      if (prevSelected.value !== null) {
+        localOptions.value[prevSelected.value].selected = false;
       }
 
-      this.prevSelected = this.currSelected;
-      this.updateValue(button);
-    },
-    updateValue(button) {
-      this.$emit('update', button.id);
+      localOptions.value[index].selected = true;
 
-      this.enableWatch = false;
+      prevSelected.value = currSelected.value;
+      updateValue(button);
+    }
+
+    function updateValue(button) {
+      emit("update:modelValue", button.id);
+
+      enableWatch.value = false;
       setTimeout(() => {
-        this.enableWatch = true;
+        enableWatch.value = true;
       }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        if (this.replaceRoute) {
-          this.$router.replace(button.path).catch(() => {});
+        if (props.replaceRoute) {
+          router.replace(button.path).catch(() => {});
         } else {
-          this.$router.push(button.path);
+          router.push(button.path);
         }
       }
     }
-  }
+
+    onMounted(() => {
+      cssLoader();
+      window.addEventListener("resize", onResize);
+    });
+
+    onBeforeUnmount(() => window.removeEventListener("resize", onResize));
+
+    localOptions.value = props.options.slice();
+    const index = localOptions.value.findIndex(
+      (item) =>
+        item.id == props.modelValue ||
+        (item.path || {}).name == (route || {}).name
+    );
+
+    if (index > -1) {
+      currSelected.value = index;
+      prevSelected.value = index;
+
+      localOptions.value[index].selected = true;
+    }
+
+    return {
+      cssVariables,
+      handleButtonClick,
+      localOptions,
+
+      borderSwiper,
+      btnContainer,
+    };
+  },
 };
 </script>
 

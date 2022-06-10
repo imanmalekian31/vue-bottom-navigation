@@ -10,14 +10,14 @@
         <div
           :class="[
             { 'rg-btn-border': button.selected },
-            { 'rg-btn-border-deselect': button.deselect }
+            { 'rg-btn-border-deselect': button.deselect },
           ]"
         />
         <div
           :class="[
             'rg-btn-icon',
             { 'rg-btn-icon-active': button.selected },
-            { 'rg-btn-icon-deselect': button.deselect }
+            { 'rg-btn-icon-deselect': button.deselect },
           ]"
         >
           <slot name="icon" :props="button">
@@ -40,148 +40,135 @@
 </template>
 
 <script>
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
-  model: {
-    prop: 'value',
-    event: 'update'
-  },
   props: {
-    value: {
-      default: null
+    modelValue: {
+      default: null,
     },
     options: {
       type: Array,
-      required: true
+      required: true,
     },
     iconColor: {
       type: String,
-      default: '#669C35'
+      default: "#669C35",
     },
     titleColor: {
       type: String,
-      default: '#669C35'
+      default: "#669C35",
     },
     borderColor: {
       type: String,
-      default: '#4F7A28'
+      default: "#4F7A28",
     },
     backgroundColor: {
       type: String,
-      default: '#FFFFFF'
+      default: "#FFFFFF",
     },
     badgeColor: {
       type: String,
-      default: '#FBC02D'
+      default: "#FBC02D",
     },
     replaceRoute: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  data: () => ({
-    prevSelected: null,
-    currSelected: null,
-    localOptions: [],
-    enableWatch: true
-  }),
-  computed: {
-    cssVariables() {
-      const styles = {
-        '--border-color': this.borderColor,
-        '--icon-color': this.iconColor,
-        '--background-color': this.backgroundColor,
-        '--title-color': this.titleColor,
-        '--badge-color': this.badgeColor
-      };
+  setup(props, { emit }) {
+    const router = useRouter();
+    const route = useRoute();
 
-      return styles;
-    }
-  },
-  watch: {
-    value: {
-      handler(newVal, oldVal) {
-        if (newVal != oldVal && this.enableWatch) {
-          const target = this.localOptions.findIndex(
+    const prevSelected = ref(null);
+    const currSelected = ref(null);
+    const localOptions = ref([]);
+    const enableWatch = ref(true);
+
+    const cssVariables = computed(() => ({
+      "--border-color": props.borderColor,
+      "--icon-color": props.iconColor,
+      "--background-color": props.backgroundColor,
+      "--title-color": props.titleColor,
+      "--badge-color": props.badgeColor,
+    }));
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (newVal != oldVal && enableWatch.value) {
+          const target = localOptions.value.findIndex(
             (option) => option.id == newVal
           );
 
           if (target > -1) {
-            this.handleButtonClick(this.localOptions[target], target);
+            handleButtonClick(localOptions.value[target], target);
           }
         }
       }
-    }
-  },
-  created() {
-    this.localOptions = this.options.slice();
-
-    const index = this.localOptions.findIndex(
-      (item) =>
-        item.id == this.value ||
-        (item.path || {}).name == (this.$route || {}).name
     );
 
-    if (index > -1) {
-      this.currSelected = index;
-      this.prevSelected = index;
-
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
-    }
-  },
-  methods: {
-    handleButtonClick(button, index) {
-      if (index === this.currSelected) {
+    function handleButtonClick(button, index) {
+      if (index === currSelected.value) {
         return;
       }
 
-      this.currSelected = index;
+      currSelected.value = index;
 
-      if (this.prevSelected !== null) {
-        const temp = this.prevSelected;
+      if (prevSelected.value !== null) {
+        const temp = prevSelected.value;
         setTimeout(() => {
-          this.localOptions[temp].deselect = false;
+          localOptions.value[temp].deselect = false;
         }, 100);
 
-        this.localOptions[this.prevSelected].selected = false;
-        this.localOptions[this.prevSelected].deselect = true;
+        localOptions.value[prevSelected.value].selected = false;
+        localOptions.value[prevSelected.value].deselect = true;
       }
 
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
+      localOptions.value[index].selected = true;
 
-      this.prevSelected = this.currSelected;
-      this.updateValue(button);
-    },
-    updateValue(button) {
-      this.$emit('update', button.id);
+      prevSelected.value = currSelected.value;
+      updateValue(button);
+    }
 
-      this.enableWatch = false;
+    function updateValue(button) {
+      emit("update:modelValue", button.id);
+
+      enableWatch.value = false;
       setTimeout(() => {
-        this.enableWatch = true;
+        enableWatch.value = true;
       }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        if (this.replaceRoute) {
-          this.$router.replace(button.path).catch(() => {});
+        if (props.replaceRoute) {
+          router.replace(button.path).catch(() => {});
         } else {
-          this.$router.push(button.path);
+          router.push(button.path);
         }
       }
     }
-  }
+
+    localOptions.value = props.options.slice();
+    const index = localOptions.value.findIndex(
+      (item) =>
+        item.id == props.modelValue ||
+        (item.path || {}).name == (route || {}).name
+    );
+
+    if (index > -1) {
+      currSelected.value = index;
+      prevSelected.value = index;
+
+      localOptions.value[index].selected = true;
+    }
+
+    return {
+      cssVariables,
+      handleButtonClick,
+      localOptions,
+    };
+  },
 };
 </script>
 
@@ -197,7 +184,7 @@ export default {
   height: 64px;
   background: var(--background-color);
   box-shadow: 0 0 5px 0 #eee;
-  color: #0000008A;
+  color: #0000008a;
   box-sizing: border-box;
   line-height: 1.5 !important;
 }

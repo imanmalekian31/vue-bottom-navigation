@@ -11,7 +11,7 @@
           :class="[
             'wn-btn-icon',
             { 'wn-btn-icon-active': button.selected },
-            { 'wn-btn-icon-deselect': button.deselect }
+            { 'wn-btn-icon-deselect': button.deselect },
           ]"
           :style="`color:${button.color}`"
         >
@@ -28,7 +28,7 @@
           :class="[
             'wn-btn-border',
             { 'wn-btn-border-selected': button.selected },
-            { 'wn-btn-border-deselect': button.deselect }
+            { 'wn-btn-border-deselect': button.deselect },
           ]"
         />
       </div>
@@ -37,138 +37,125 @@
 </template>
 
 <script>
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
-  model: {
-    prop: 'value',
-    event: 'update'
-  },
   props: {
-    value: {
-      default: null
+    modelValue: {
+      default: null,
     },
     options: {
       type: Array,
-      required: true
+      required: true,
     },
     borderColor: {
       type: String,
-      default: '#9B9B9B'
+      default: "#9B9B9B",
     },
     backgroundColor: {
       type: String,
-      default: '#FFFFFF'
+      default: "#FFFFFF",
     },
     badgeColor: {
       type: String,
-      default: '#828282'
+      default: "#828282",
     },
     replaceRoute: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  data: () => ({
-    prevSelected: null,
-    currSelected: null,
-    localOptions: [],
-    enableWatch: true
-  }),
-  computed: {
-    cssVariables() {
-      const styles = {
-        '--border-color': this.borderColor,
-        '--background-color': this.backgroundColor,
-        '--badge-color': this.badgeColor
-      };
+  setup(props, { emit }) {
+    const router = useRouter();
+    const route = useRoute();
 
-      return styles;
-    }
-  },
-  watch: {
-    value: {
-      handler(newVal, oldVal) {
-        if (newVal != oldVal && this.enableWatch) {
-          const target = this.localOptions.findIndex(
+    const prevSelected = ref(null);
+    const currSelected = ref(null);
+    const localOptions = ref([]);
+    const enableWatch = ref(true);
+
+    const cssVariables = computed(() => ({
+      "--border-color": props.borderColor,
+      "--background-color": props.backgroundColor,
+      "--badge-color": props.badgeColor,
+    }));
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (newVal != oldVal && enableWatch.value) {
+          const target = localOptions.value.findIndex(
             (option) => option.id == newVal
           );
 
           if (target > -1) {
-            this.handleButtonClick(this.localOptions[target], target);
+            handleButtonClick(localOptions.value[target], target);
           }
         }
       }
-    }
-  },
-  created() {
-    this.localOptions = this.options.slice();
-
-    const index = this.localOptions.findIndex(
-      (item) =>
-        item.id == this.value ||
-        (item.path || {}).name == (this.$route || {}).name
     );
 
-    if (index > -1) {
-      this.currSelected = index;
-      this.prevSelected = index;
-
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
-    }
-  },
-  methods: {
-    handleButtonClick(button, index) {
-      if (index === this.currSelected) {
+    function handleButtonClick(button, index) {
+      if (index === currSelected.value) {
         return;
       }
 
-      this.currSelected = index;
+      currSelected.value = index;
 
-      if (this.prevSelected !== null) {
-        const temp = this.prevSelected;
+      if (prevSelected.value !== null) {
+        const temp = prevSelected.value;
         setTimeout(() => {
-          this.localOptions[temp].deselect = false;
+          localOptions.value[temp].deselect = false;
         }, 300);
 
-        this.localOptions[this.prevSelected].selected = false;
-        this.localOptions[this.prevSelected].deselect = true;
+        localOptions.value[prevSelected.value].selected = false;
+        localOptions.value[prevSelected.value].deselect = true;
       }
 
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
+      localOptions.value[index].selected = true;
 
-      this.prevSelected = this.currSelected;
-      this.updateValue(button);
-    },
-    updateValue(button) {
-      this.$emit('update', button.id);
+      prevSelected.value = currSelected.value;
+      updateValue(button);
+    }
 
-      this.enableWatch = false;
+    function updateValue(button) {
+      emit("update:modelValue", button.id);
+
+      enableWatch.value = false;
       setTimeout(() => {
-        this.enableWatch = true;
+        enableWatch.value = true;
       }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        if (this.replaceRoute) {
-          this.$router.replace(button.path).catch(() => {});
+        if (props.replaceRoute) {
+          router.replace(button.path).catch(() => {});
         } else {
-          this.$router.push(button.path);
+          router.push(button.path);
         }
       }
     }
-  }
+
+    localOptions.value = props.options.slice();
+    const index = localOptions.value.findIndex(
+      (item) =>
+        item.id == props.modelValue ||
+        (item.path || {}).name == (route || {}).name
+    );
+
+    if (index > -1) {
+      currSelected.value = index;
+      prevSelected.value = index;
+
+      localOptions.value[index].selected = true;
+    }
+
+    return {
+      cssVariables,
+      handleButtonClick,
+      localOptions,
+    };
+  },
 };
 </script>
 

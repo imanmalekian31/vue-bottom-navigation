@@ -7,7 +7,7 @@
         :class="{
           [`btn-item-${index} labels`]: true,
           ['checked']: button.isActive,
-          ['unchecked']: !button.isActive
+          ['unchecked']: !button.isActive,
         }"
         @click="handleLabelClick(button)"
       >
@@ -30,7 +30,7 @@
           v-if="hasChild(button)"
           :class="{
             ['btn-super-parent']: button.isActive,
-            ['btn-class-showable']: showable
+            ['btn-class-showable']: showable,
           }"
         >
           <div class="btn-child-parent">
@@ -68,121 +68,116 @@
 </template>
 
 <script>
+import {
+  ref,
+  computed,
+  watch,
+  onMounted,
+  onBeforeUnmount,
+  nextTick,
+} from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
-  name: 'VueBottomNavigation',
-  model: {
-    prop: 'value',
-    event: 'update'
-  },
   props: {
-    value: {
-      default: null
+    modelValue: {
+      default: null,
     },
     options: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     foregroundColor: {
       type: String,
-      default: '#42A5F5'
+      default: "#42A5F5",
     },
     backgroundColor: {
       type: String,
-      default: '#FFFFFF'
+      default: "#FFFFFF",
     },
     iconColor: {
       type: String,
-      default: '#0000008A'
+      default: "#0000008A",
     },
     badgeColor: {
       type: String,
-      default: '#FBC02D'
+      default: "#FBC02D",
     },
     replaceRoute: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  data: () => ({
-    localOptions: [],
-    showable: false,
-    enableWatch: true
-  }),
-  computed: {
-    cssVariables() {
+  setup(props, { emit }) {
+    const router = useRouter();
+    const route = useRoute();
+
+    const localOptions = ref([]);
+    const showable = ref(false);
+    const enableWatch = ref(true);
+
+    const cssVariables = computed(() => {
       const countChilds = (
-        (this.localOptions.find((option) => option.isActive) || {}).childs || []
+        (localOptions.value.find((option) => option.isActive) || {}).childs ||
+        []
       ).length;
 
       const styles = {
-        '--color-foreground': this.foregroundColor,
-        '--color-background': this.backgroundColor,
-        '--color-icon': this.iconColor,
-        '--color-badge': this.badgeColor,
-        '--width-parent': `${countChilds * 45}px`
+        "--color-foreground": props.foregroundColor,
+        "--color-background": props.backgroundColor,
+        "--color-icon": props.iconColor,
+        "--color-badge": props.badgeColor,
+        "--width-parent": `${countChilds * 45}px`,
       };
 
       return styles;
-    },
+    });
+    const hasActiveClass = computed(() => {
+      return localOptions.value.find((option) => option.isActive);
+    });
 
-    hasActiveClass() {
-      return this.localOptions.some((option) => option.isActive);
-    }
-  },
-  watch: {
-    options: {
-      deep: true,
-      handler(newVal) {
-        if (newVal) {
-          this.localOptions = newVal.map((option) => ({
-            ...option,
-            isActive: this.isActive(option)
-          }));
-          this.cssLoader();
-        }
-      }
-    },
-    value: {
-      handler(newVal, oldVal) {
-        if (newVal != oldVal && this.enableWatch) {
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (newVal != oldVal && enableWatch.value) {
           const childs = [];
-          this.localOptions.forEach((option) => {
+          localOptions.value.forEach((option) => {
             if (option.childs) {
               childs.push(...option.childs);
             }
           });
-          const target = [...this.localOptions, ...childs].find(
+          const target = [...localOptions.value, ...childs].find(
             (option) => option.id == newVal
           );
           if (target) {
-            this.updateValue(target, this.hasChild(target));
+            updateValue(target, hasChild(target));
           }
         }
       }
-    }
-  },
-  created() {
-    this.localOptions = this.options.map((option) => ({
-      ...option,
-      isActive: this.isActive(option)
-    }));
-  },
-  mounted() {
-    this.cssLoader();
-    window.addEventListener('resize', this.onResize);
-  },
-  beforeDestroy() {
-    window.removeEventListener('resize', this.onResize);
-  },
-  methods: {
-    cssLoader() {
-      let customStyle = '';
+    );
+
+    watch(
+      () => props.options,
+      (newVal) => {
+        if (newVal) {
+          localOptions.value = newVal.map((option) => ({
+            ...option,
+            isActive: isActive(option),
+          }));
+          cssLoader();
+        }
+      },
+      { deep: true }
+    );
+
+    function cssLoader() {
+      let customStyle = "";
       const containerWidth =
-        document.querySelector('.btn-container').offsetWidth ||
+        document.querySelector(".btn-container").offsetWidth ||
         window.innerWidth;
 
-      this.options.forEach((item, index) => {
-        if (index === 0 && this.hasChild(item)) {
+      props.options.forEach((item, index) => {
+        if (index === 0 && hasChild(item)) {
           customStyle += `
           .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
             transform: translateX(${(item.childs.length * 45) / 2 - 35}px);
@@ -191,7 +186,7 @@ export default {
           `;
         }
 
-        if (index === this.options.length - 1 && this.hasChild(item)) {
+        if (index === props.options.length - 1 && hasChild(item)) {
           customStyle += `
           .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
             transform: translateX(-${(item.childs.length * 45) / 2 - 35}px);
@@ -204,7 +199,7 @@ export default {
         .btn-item-${index} {
           padding: 10px;
           transition: transform 100ms ease;
-          width : ${containerWidth / this.options.length}px !important;
+          width : ${containerWidth / props.options.length}px !important;
           display: flex;
           justify-content :center;
           align-items : center;
@@ -214,14 +209,14 @@ export default {
 
         .btn-item-${index}.checked ~ #sweep {
           transform: translateX(${
-            (index * containerWidth) / this.options.length +
-            containerWidth / this.options.length / 4
+            (index * containerWidth) / props.options.length +
+            containerWidth / props.options.length / 4
           }px);
           transition: transform 500ms ease;
         }
         `;
 
-        if (this.hasChild(item)) {
+        if (hasChild(item)) {
           item.childs.forEach((child, idx) => {
             customStyle += `
             .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${
@@ -237,12 +232,12 @@ export default {
         }
       });
 
-      document.getElementById('sweep').style.left = `
-      ${containerWidth / this.options.length / 4 - 135 / 2}px`;
+      document.getElementById("sweep").style.left = `
+      ${containerWidth / props.options.length / 4 - 135 / 2}px`;
 
-      const head = document.getElementsByTagName('head')[0];
-      const style = document.createElement('style');
-      style.id = 'bottom-navigation-style';
+      const head = document.getElementsByTagName("head")[0];
+      const style = document.createElement("style");
+      style.id = "bottom-navigation-style";
 
       if (style.styleSheet) {
         style.styleSheet.cssText = customStyle;
@@ -251,60 +246,83 @@ export default {
       }
 
       head.appendChild(style);
-    },
-    handleLabelClick(button) {
-      if (!this.showable || button.isActive) {
-        this.toggleClass();
+    }
+    function handleLabelClick(button) {
+      if (!showable.value || button.isActive) {
+        toggleClass();
       }
 
-      this.updateValue(button, this.hasChild(button));
-    },
-    handleChildClick(button) {
-      this.updateValue(button);
-      this.toggleClass();
-    },
-    updateValue(button, prevent = false) {
-      this.localOptions.forEach(
-        (option) => (option.isActive = this.isActive(option, button.id))
+      updateValue(button, hasChild(button));
+    }
+    function handleChildClick(button) {
+      updateValue(button);
+      toggleClass();
+    }
+    function updateValue(button, prevent = false) {
+      localOptions.value.forEach(
+        (option) => (option.isActive = isActive(option, button.id))
       );
 
       if (!prevent) {
-        this.$emit('update', button.id);
-        this.enableWatch = false;
+        emit("update:modelValue", button.id);
+        enableWatch.value = false;
         setTimeout(() => {
-          this.enableWatch = true;
+          enableWatch.value = true;
         }, 0);
 
         if (button.path && Object.keys(button.path).length) {
-          if (this.replaceRoute) {
-            this.$router.replace(button.path).catch(() => {});
+          if (props.replaceRoute) {
+            router.replace(button.path).catch(() => {});
           } else {
-            this.$router.push(button.path);
+            router.push(button.path);
           }
         }
       }
-    },
-    toggleClass() {
-      this.showable = !this.showable;
-    },
-    isActive(button, value = this.value) {
+    }
+    function toggleClass() {
+      showable.value = !showable.value;
+    }
+    function isActive(button, value = props.modelValue) {
       return (
         button.id == value ||
         (button.childs || []).find((child) => child.id == value)
       );
-    },
-    onResize() {
-      this.$nextTick(() => {
-        const styleElement = document.getElementById('bottom-navigation-style');
+    }
+    function onResize() {
+      nextTick(() => {
+        const styleElement = document.getElementById("bottom-navigation-style");
         styleElement && styleElement.remove();
       });
 
-      this.cssLoader();
-    },
-    hasChild(button) {
+      cssLoader();
+    }
+
+    function hasChild(button) {
       return (button.childs || []).length;
     }
-  }
+
+    onMounted(() => {
+      cssLoader();
+      window.addEventListener("resize", onResize);
+    });
+
+    onBeforeUnmount(() => window.removeEventListener("resize", onResize));
+
+    localOptions.value = props.options.map((option) => ({
+      ...option,
+      isActive: isActive(option),
+    }));
+
+    return {
+      cssVariables,
+      handleChildClick,
+      handleLabelClick,
+      hasChild,
+      localOptions,
+      hasActiveClass,
+      showable,
+    };
+  },
 };
 </script>
 
@@ -425,7 +443,7 @@ input {
 }
 
 #sweep-left:before {
-  content: '';
+  content: "";
   display: block;
   width: 220%;
   height: 200%;
@@ -445,7 +463,7 @@ input {
 }
 
 #sweep-right:before {
-  content: '';
+  content: "";
   display: block;
   width: 220%;
   height: 200%;

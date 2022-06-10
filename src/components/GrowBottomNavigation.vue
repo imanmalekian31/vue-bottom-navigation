@@ -5,8 +5,9 @@
       :key="`grow-button-${index}`"
       :class="[
         'gr-btn-container',
-        { 'gr-btn-container-active': button.selected }
+        { 'gr-btn-container-active': button.selected },
       ]"
+      :to="button.path"
       @click="handleButtonClick(button, index)"
     >
       <div :class="['gr-btn-item', { 'gr-btn-item-active': button.selected }]">
@@ -26,7 +27,7 @@
           <span
             :class="[
               'gr-animated-title',
-              { 'gr-animated-title-active': button.selected }
+              { 'gr-animated-title-active': button.selected },
             ]"
           >
             <slot name="title" :props="button">
@@ -40,129 +41,124 @@
 </template>
 
 <script>
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
+
 export default {
-  model: {
-    prop: 'value',
-    event: 'update'
-  },
   props: {
-    value: {
-      default: null
+    modelValue: {
+      default: null,
     },
     options: {
       type: Array,
-      default: () => []
+      default: () => [],
     },
     color: {
       type: String,
-      default: '#74cbbb'
+      default: "#74cbbb",
     },
     replaceRoute: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
-  data: () => ({
-    prevSelected: null,
-    currSelected: null,
-    localOptions: [],
-    enableWatch: true
-  }),
-  computed: {
-    cssVariables() {
-      const activeTitle = (this.localOptions[this.currSelected] || {}).title;
+  setup(props, { emit }) {
+    const router = useRouter();
+    const route = useRoute();
+
+    const prevSelected = ref(null);
+    const currSelected = ref(null);
+    const localOptions = ref([]);
+    const enableWatch = ref(true);
+
+    const cssVariables = computed(() => {
+      const activeTitle = (localOptions.value[currSelected.value] || {}).title;
       let activeWidth = 95;
       if (activeTitle && activeTitle.length * 15 > 110) {
         activeWidth = 95 + (activeTitle.length * 15 - 110) / 2;
       }
 
       const mainColor =
-        (this.localOptions[this.currSelected] || {}).color || this.color;
+        (localOptions.value[currSelected.value] || {}).color || props.color;
 
       const styles = {
-        '--color': mainColor,
-        '--color-background': mainColor + '30',
-        '--active-width': `${activeWidth}px`
+        "--color": mainColor,
+        "--color-background": mainColor + "30",
+        "--active-width": `${activeWidth}px`,
       };
 
       return styles;
-    }
-  },
-  watch: {
-    value: {
-      handler(newVal, oldVal) {
-        if (newVal != oldVal && this.enableWatch) {
-          const target = this.localOptions.findIndex(
+    });
+
+    watch(
+      () => props.modelValue,
+      (newVal, oldVal) => {
+        if (newVal != oldVal && enableWatch.value) {
+          const target = localOptions.value.findIndex(
             (option) => option.id == newVal
           );
 
           if (target > -1) {
-            this.handleButtonClick(this.localOptions[target], target);
+            handleButtonClick(localOptions.value[target], target);
           }
         }
       }
-    }
-  },
-  created() {
-    this.localOptions = this.options.slice();
-
-    const index = this.localOptions.findIndex(
-      (item) =>
-        item.id == this.value ||
-        (item.path || {}).name == (this.$route || {}).name
     );
 
-    if (index > -1) {
-      this.currSelected = index;
-      this.prevSelected = index;
-
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
+    function handleButtonClick(button, index) {
+      if (index === currSelected.value) {
+        return;
       }
+
+      currSelected.value = index;
+
+      if (prevSelected.value !== null) {
+        localOptions.value[prevSelected.value].selected = false;
+      }
+
+      localOptions.value[index].selected = true;
+
+      prevSelected.value = currSelected.value;
+      updateValue(button);
     }
-  },
-  methods: {
-    handleButtonClick(button, index) {
-      this.currSelected = index;
 
-      if (this.prevSelected !== null) {
-        this.localOptions[this.prevSelected].selected = false;
-      }
+    function updateValue(button) {
+      emit("update:modelValue", button.id);
 
-      if ('$set' in this) {
-        this.$set(this.localOptions, index, {
-          ...this.localOptions[index],
-          selected: true
-        });
-      } else {
-        this.localOptions[index].selected = true;
-      }
-
-      this.prevSelected = this.currSelected;
-      this.updateValue(button);
-    },
-    updateValue(button) {
-      this.$emit('update', button.id);
-
-      this.enableWatch = false;
+      enableWatch.value = false;
       setTimeout(() => {
-        this.enableWatch = true;
+        enableWatch.value = true;
       }, 0);
 
       if (button.path && Object.keys(button.path).length) {
-        if (this.replaceRoute) {
-          this.$router.replace(button.path).catch(() => {});
+        if (props.replaceRoute) {
+          router.replace(button.path).catch(() => {});
         } else {
-          this.$router.push(button.path);
+          router.push(button.path);
         }
       }
     }
-  }
+
+    localOptions.value = props.options.slice();
+    const index = localOptions.value.findIndex(
+      (item) =>
+        item.id == props.modelValue ||
+        (item.path || {}).name == (route || {}).name
+    );
+
+    if (index > -1) {
+      currSelected.value = index;
+      prevSelected.value = index;
+
+      localOptions.value[index].selected = true;
+    }
+
+    return {
+      cssVariables,
+      handleButtonClick,
+      localOptions,
+    };
+  },
 };
 </script>
 

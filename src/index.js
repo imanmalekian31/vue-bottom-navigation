@@ -1,10 +1,10 @@
 import CurvedBottomNavigation from "./components/CurvedBottomNavigation.vue";
 import GrowBottomNavigation from "./components/GrowBottomNavigation.vue";
-import SwipeBottomNavigation from "./components/SwipeBottomNavigation.vue";
 import RingBottomNavigation from "./components/RingBottomNavigation.vue";
+import SwipeBottomNavigation from "./components/SwipeBottomNavigation.vue";
 import WindowsBottomNavigation from "./components/WindowsBottomNavigation.vue";
 
-export default {
+const plugin = {
   install(Vue) {
     Vue.component("CurvedBottomNavigation", CurvedBottomNavigation);
     Vue.component("GrowBottomNavigation", GrowBottomNavigation);
@@ -17,7 +17,9 @@ export default {
 export {
   CurvedBottomNavigation,
   GrowBottomNavigation,
-  SwipeBottomNavigation,
   RingBottomNavigation,
-  WindowsBottomNavigation
+  SwipeBottomNavigation,
+  WindowsBottomNavigation,
 };
+
+export default plugin;

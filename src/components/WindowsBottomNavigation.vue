@@ -36,127 +36,119 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+<script setup>
+import { ref, computed, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
-export default {
-  props: {
-    modelValue: {
-      default: null,
-    },
-    options: {
-      type: Array,
-      required: true,
-    },
-    borderColor: {
-      type: String,
-      default: "#9B9B9B",
-    },
-    backgroundColor: {
-      type: String,
-      default: "#FFFFFF",
-    },
-    badgeColor: {
-      type: String,
-      default: "#828282",
-    },
-    replaceRoute: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    default: null
   },
-  setup(props, { emit }) {
-    const router = useRouter();
-    const route = useRoute();
+  options: {
+    type: Array,
+    required: true
+  },
+  borderColor: {
+    type: String,
+    default: '#9B9B9B'
+  },
+  backgroundColor: {
+    type: String,
+    default: '#FFFFFF'
+  },
+  badgeColor: {
+    type: String,
+    default: '#828282'
+  },
+  replaceRoute: {
+    type: Boolean,
+    default: false
+  }
+})
+const emit = defineEmits(['update:modelValue'])
 
-    const prevSelected = ref(null);
-    const currSelected = ref(null);
-    const localOptions = ref([]);
-    const enableWatch = ref(true);
+const router = useRouter()
+const route = useRoute()
 
-    const cssVariables = computed(() => ({
-      "--border-color": props.borderColor,
-      "--background-color": props.backgroundColor,
-      "--badge-color": props.badgeColor,
-    }));
+const prevSelected = ref(null)
+const currSelected = ref(null)
+const localOptions = ref([])
+const enableWatch = ref(true)
 
-    watch(
-      () => props.modelValue,
-      (newVal, oldVal) => {
-        if (newVal != oldVal && enableWatch.value) {
-          const target = localOptions.value.findIndex(
-            (option) => option.id == newVal
-          );
+const cssVariables = computed(() => ({
+  '--border-color': props.borderColor,
+  '--background-color': props.backgroundColor,
+  '--badge-color': props.badgeColor
+}))
 
-          if (target > -1) {
-            handleButtonClick(localOptions.value[target], target);
-          }
-        }
-      }
-    );
+watch(
+  () => props.modelValue,
+  (newVal, oldVal) => {
+    if (newVal != oldVal && enableWatch.value) {
+      const target = localOptions.value.findIndex(
+        (option) => option.id == newVal
+      )
 
-    function handleButtonClick(button, index) {
-      if (index === currSelected.value) {
-        return;
-      }
-
-      currSelected.value = index;
-
-      if (prevSelected.value !== null) {
-        const temp = prevSelected.value;
-        setTimeout(() => {
-          localOptions.value[temp].deselect = false;
-        }, 300);
-
-        localOptions.value[prevSelected.value].selected = false;
-        localOptions.value[prevSelected.value].deselect = true;
-      }
-
-      localOptions.value[index].selected = true;
-
-      prevSelected.value = currSelected.value;
-      updateValue(button);
-    }
-
-    function updateValue(button) {
-      emit("update:modelValue", button.id);
-
-      enableWatch.value = false;
-      setTimeout(() => {
-        enableWatch.value = true;
-      }, 0);
-
-      if (button.path && Object.keys(button.path).length) {
-        if (props.replaceRoute) {
-          router.replace(button.path).catch(() => {});
-        } else {
-          router.push(button.path);
-        }
+      if (target > -1) {
+        handleButtonClick(localOptions.value[target], target)
       }
     }
+  }
+)
 
-    localOptions.value = props.options.slice();
-    const index = localOptions.value.findIndex(
-      (item) =>
-        item.id == props.modelValue ||
+function handleButtonClick (button, index) {
+  if (index === currSelected.value) {
+    return
+  }
+
+  currSelected.value = index
+
+  if (prevSelected.value !== null) {
+    const temp = prevSelected.value
+    setTimeout(() => {
+      localOptions.value[temp].deselect = false
+    }, 300)
+
+    localOptions.value[prevSelected.value].selected = false
+    localOptions.value[prevSelected.value].deselect = true
+  }
+
+  localOptions.value[index].selected = true
+
+  prevSelected.value = currSelected.value
+  updateValue(button)
+}
+
+function updateValue (button) {
+  emit('update:modelValue', button.id)
+
+  enableWatch.value = false
+  setTimeout(() => {
+    enableWatch.value = true
+  }, 0)
+
+  if (button.path && Object.keys(button.path).length) {
+    if (props.replaceRoute) {
+      router.replace(button.path).catch(() => {})
+    } else {
+      router.push(button.path)
+    }
+  }
+}
+
+localOptions.value = props.options.slice()
+const index = localOptions.value.findIndex(
+  (item) =>
+    item.id == props.modelValue ||
         (item.path || {}).name == (route || {}).name
-    );
+)
 
-    if (index > -1) {
-      currSelected.value = index;
-      prevSelected.value = index;
+if (index > -1) {
+  currSelected.value = index
+  prevSelected.value = index
 
-      localOptions.value[index].selected = true;
-    }
-
-    return {
-      cssVariables,
-      handleButtonClick,
-      localOptions,
-    };
-  },
-};
+  localOptions.value[index].selected = true
+}
 </script>
 
 <style scoped>

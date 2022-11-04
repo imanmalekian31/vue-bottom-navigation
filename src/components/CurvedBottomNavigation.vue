@@ -67,263 +67,214 @@
   </div>
 </template>
 
-<script>
+<script setup>
 import {
   ref,
   computed,
   watch,
   onMounted,
   onBeforeUnmount,
-  nextTick,
-} from "vue";
-import { useRouter, useRoute } from "vue-router";
+  nextTick
+} from 'vue'
+import { useRouter } from 'vue-router'
 
-export default {
-  props: {
-    modelValue: {
-      default: null,
-    },
-    options: {
-      type: Array,
-      default: () => [],
-    },
-    foregroundColor: {
-      type: String,
-      default: "#42A5F5",
-    },
-    backgroundColor: {
-      type: String,
-      default: "#FFFFFF",
-    },
-    iconColor: {
-      type: String,
-      default: "#0000008A",
-    },
-    badgeColor: {
-      type: String,
-      default: "#FBC02D",
-    },
-    replaceRoute: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    default: null
   },
-  setup(props, { emit }) {
-    const router = useRouter();
-    const route = useRoute();
+  options: {
+    type: Array,
+    default: () => []
+  },
+  foregroundColor: {
+    type: String,
+    default: '#42A5F5'
+  },
+  backgroundColor: {
+    type: String,
+    default: '#FFFFFF'
+  },
+  iconColor: {
+    type: String,
+    default: '#0000008A'
+  },
+  badgeColor: {
+    type: String,
+    default: '#FBC02D'
+  },
+  replaceRoute: {
+    type: Boolean,
+    default: false
+  }
+})
+const emit = defineEmits(['update:modelValue'])
 
-    const localOptions = ref([]);
-    const showable = ref(false);
-    const enableWatch = ref(true);
+const router = useRouter()
 
-    const cssVariables = computed(() => {
-      const countChilds = (
-        (localOptions.value.find((option) => option.isActive) || {}).childs ||
+const localOptions = ref([])
+const showable = ref(false)
+const enableWatch = ref(true)
+
+const cssVariables = computed(() => {
+  const countChilds = (
+    (localOptions.value.find((option) => option.isActive) || {}).childs ||
         []
-      ).length;
+  ).length
 
-      const styles = {
-        "--color-foreground": props.foregroundColor,
-        "--color-background": props.backgroundColor,
-        "--color-icon": props.iconColor,
-        "--color-badge": props.badgeColor,
-        "--width-parent": `${countChilds * 45}px`,
-      };
+  const styles = {
+    '--color-foreground': props.foregroundColor,
+    '--color-background': props.backgroundColor,
+    '--color-icon': props.iconColor,
+    '--color-badge': props.badgeColor,
+    '--width-parent': `${countChilds * 45}px`
+  }
 
-      return styles;
-    });
-    const hasActiveClass = computed(() => {
-      return localOptions.value.find((option) => option.isActive);
-    });
+  return styles
+})
+const hasActiveClass = computed(() => {
+  return localOptions.value.find((option) => option.isActive)
+})
 
-    watch(
-      () => props.modelValue,
-      (newVal, oldVal) => {
-        if (newVal != oldVal && enableWatch.value) {
-          const childs = [];
-          localOptions.value.forEach((option) => {
-            if (option.childs) {
-              childs.push(...option.childs);
-            }
-          });
-          const target = [...localOptions.value, ...childs].find(
-            (option) => option.id == newVal
-          );
-          if (target) {
-            updateValue(target, hasChild(target));
-          }
+watch(
+  () => props.modelValue,
+  (newVal, oldVal) => {
+    if (newVal != oldVal && enableWatch.value) {
+      const childs = []
+      localOptions.value.forEach((option) => {
+        if (option.childs) {
+          childs.push(...option.childs)
         }
-      }
-    );
-
-    watch(
-      () => props.options,
-      (newVal) => {
-        if (newVal) {
-          localOptions.value = newVal.map((option) => ({
-            ...option,
-            isActive: isActive(option),
-          }));
-          cssLoader();
-        }
-      },
-      { deep: true }
-    );
-
-    function cssLoader() {
-      let customStyle = "";
-      const containerWidth =
-        document.querySelector(".btn-container").offsetWidth ||
-        window.innerWidth;
-
-      props.options.forEach((item, index) => {
-        if (index === 0 && hasChild(item)) {
-          customStyle += `
-          .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
-            transform: translateX(${(item.childs.length * 45) / 2 - 35}px);
-            transition: transform 500ms ease 300ms;
-          }
-          `;
-        }
-
-        if (index === props.options.length - 1 && hasChild(item)) {
-          customStyle += `
-          .btn-item-${index}.checked .btn-class-showable .btn-child-parent {
-            transform: translateX(-${(item.childs.length * 45) / 2 - 35}px);
-            transition: transform 500ms ease 300ms;
-          }
-          `;
-        }
-
-        customStyle += `
-        .btn-item-${index} {
-          padding: 10px;
-          transition: transform 100ms ease;
-          width : ${containerWidth / props.options.length}px !important;
-          display: flex;
-          justify-content :center;
-          align-items : center;
-          position: relative;
-          z-index: 10;
-        }
-
-        .btn-item-${index}.checked ~ #sweep {
-          transform: translateX(${
-            (index * containerWidth) / props.options.length +
-            containerWidth / props.options.length / 4
-          }px);
-          transition: transform 500ms ease;
-        }
-        `;
-
-        if (hasChild(item)) {
-          item.childs.forEach((child, idx) => {
-            customStyle += `
-            .btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${
-              idx + 1
-            }) {
-              transform: translateX(${
-                (0.5 + idx) * 45 - (item.childs.length * 45) / 2
-              }px);
-              transition: transform 500ms ease 300ms;
-            }
-          `;
-          });
-        }
-      });
-
-      document.getElementById("sweep").style.left = `
-      ${containerWidth / props.options.length / 4 - 135 / 2}px`;
-
-      const head = document.getElementsByTagName("head")[0];
-      const style = document.createElement("style");
-      style.id = "bottom-navigation-style";
-
-      if (style.styleSheet) {
-        style.styleSheet.cssText = customStyle;
-      } else {
-        style.appendChild(document.createTextNode(customStyle));
-      }
-
-      head.appendChild(style);
-    }
-    function handleLabelClick(button) {
-      if (!showable.value || button.isActive) {
-        toggleClass();
-      }
-
-      updateValue(button, hasChild(button));
-    }
-    function handleChildClick(button) {
-      updateValue(button);
-      toggleClass();
-    }
-    function updateValue(button, prevent = false) {
-      localOptions.value.forEach(
-        (option) => (option.isActive = isActive(option, button.id))
-      );
-
-      if (!prevent) {
-        emit("update:modelValue", button.id);
-        enableWatch.value = false;
-        setTimeout(() => {
-          enableWatch.value = true;
-        }, 0);
-
-        if (button.path && Object.keys(button.path).length) {
-          if (props.replaceRoute) {
-            router.replace(button.path).catch(() => {});
-          } else {
-            router.push(button.path);
-          }
-        }
+      })
+      const target = [...localOptions.value, ...childs].find(
+        (option) => option.id == newVal
+      )
+      if (target) {
+        updateValue(target, hasChild(target))
       }
     }
-    function toggleClass() {
-      showable.value = !showable.value;
+  }
+)
+
+watch(
+  () => props.options,
+  (newVal) => {
+    if (newVal) {
+      localOptions.value = newVal.map((option) => ({
+        ...option,
+        isActive: isActive(option)
+      }))
+      cssLoader()
     }
-    function isActive(button, value = props.modelValue) {
-      return (
-        button.id == value ||
-        (button.childs || []).find((child) => child.id == value)
-      );
-    }
-    function onResize() {
-      nextTick(() => {
-        const styleElement = document.getElementById("bottom-navigation-style");
-        styleElement && styleElement.remove();
-      });
-
-      cssLoader();
-    }
-
-    function hasChild(button) {
-      return (button.childs || []).length;
-    }
-
-    onMounted(() => {
-      cssLoader();
-      window.addEventListener("resize", onResize);
-    });
-
-    onBeforeUnmount(() => window.removeEventListener("resize", onResize));
-
-    localOptions.value = props.options.map((option) => ({
-      ...option,
-      isActive: isActive(option),
-    }));
-
-    return {
-      cssVariables,
-      handleChildClick,
-      handleLabelClick,
-      hasChild,
-      localOptions,
-      hasActiveClass,
-      showable,
-    };
   },
-};
+  { deep: true }
+)
+
+function cssLoader () {
+  let customStyle = ''
+  const containerWidth =
+        document.querySelector('.btn-container').offsetWidth ||
+        window.innerWidth
+
+  props.options.forEach((item, index) => {
+    if (index === 0 && hasChild(item)) {
+      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent{transform:translateX(${(item.childs.length * 45) / 2 - 35}px);transition:transform 500ms ease 300ms;}`
+    }
+
+    if (index === props.options.length - 1 && hasChild(item)) {
+      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent {transform:translateX(-${(item.childs.length * 45) / 2 - 35}px);transition:transform 500ms ease 300ms;}`
+    }
+
+    customStyle += `.btn-item-${index}{padding:10px;transition: transform 100ms ease;width:${containerWidth / props.options.length}px !important;display:flex;justify-content:center;align-items:center;position:relative;z-index:10;}`
+    customStyle += `.btn-item-${index}.checked ~ #sweep{transform:translateX(${(index * containerWidth) / props.options.length + containerWidth / props.options.length / 4}px);transition:transform 500ms ease;}`
+
+    if (hasChild(item)) {
+      item.childs.forEach((child, idx) => {
+        customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${idx + 1}){transform:translateX(${(0.5 + idx) * 45 - (item.childs.length * 45) / 2}px);transition:transform 500ms ease 300ms;}`
+      })
+    }
+  })
+
+  document.getElementById('sweep').style.left = `
+      ${containerWidth / props.options.length / 4 - 135 / 2}px`
+
+  const head = document.getElementsByTagName('head')[0]
+  const style = document.createElement('style')
+  style.id = 'bottom-navigation-style'
+
+  customStyle = customStyle.trim()
+  if (style.styleSheet) {
+    style.styleSheet.cssText = customStyle
+  } else {
+    style.appendChild(document.createTextNode(customStyle))
+  }
+
+  head.appendChild(style)
+}
+function handleLabelClick (button) {
+  if (!showable.value || button.isActive) {
+    toggleClass()
+  }
+
+  updateValue(button, hasChild(button))
+}
+function handleChildClick (button) {
+  updateValue(button)
+  toggleClass()
+}
+function updateValue (button, prevent = false) {
+  localOptions.value.forEach(
+    (option) => (option.isActive = isActive(option, button.id))
+  )
+
+  if (!prevent) {
+    emit('update:modelValue', button.id)
+    enableWatch.value = false
+    setTimeout(() => {
+      enableWatch.value = true
+    }, 0)
+
+    if (button.path && Object.keys(button.path).length) {
+      if (props.replaceRoute) {
+        router.replace(button.path).catch(() => {})
+      } else {
+        router.push(button.path)
+      }
+    }
+  }
+}
+function toggleClass () {
+  showable.value = !showable.value
+}
+function isActive (button, value = props.modelValue) {
+  return (
+    button.id == value ||
+        (button.childs || []).find((child) => child.id == value)
+  )
+}
+function onResize () {
+  nextTick(() => {
+    const styleElement = document.getElementById('bottom-navigation-style')
+    styleElement && styleElement.remove()
+  })
+
+  cssLoader()
+}
+
+function hasChild (button) {
+  return (button.childs || []).length
+}
+
+onMounted(() => {
+  cssLoader()
+  window.addEventListener('resize', onResize)
+})
+
+onBeforeUnmount(() => window.removeEventListener('resize', onResize))
+
+localOptions.value = props.options.map((option) => ({
+  ...option,
+  isActive: isActive(option)
+}))
 </script>
 
 <style scoped>

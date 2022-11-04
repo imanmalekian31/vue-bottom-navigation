@@ -29,156 +29,145 @@
   </div>
 </template>
 
-<script>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
-import { useRouter, useRoute } from "vue-router";
+<script setup>
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
-export default {
-  props: {
-    modelValue: {
-      default: null,
-    },
-    options: {
-      type: Array,
-      required: true,
-    },
-    backgroundColor: {
-      type: String,
-      default: "#FFFFFF",
-    },
-    iconColor: {
-      type: String,
-      default: "#8066C7",
-    },
-    swiperColor: {
-      type: String,
-      default: "#8066C7",
-    },
-    replaceRoute: {
-      type: Boolean,
-      default: false,
-    },
+const props = defineProps({
+  modelValue: {
+    default: null
   },
-  setup(props, { emit }) {
-    const router = useRouter();
-    const route = useRoute();
+  options: {
+    type: Array,
+    required: true
+  },
+  backgroundColor: {
+    type: String,
+    default: '#FFFFFF'
+  },
+  iconColor: {
+    type: String,
+    default: '#8066C7'
+  },
+  swiperColor: {
+    type: String,
+    default: '#8066C7'
+  },
+  replaceRoute: {
+    type: Boolean,
+    default: false
+  }
+})
+const emit = defineEmits(['update:modelValue'])
 
-    const prevSelected = ref(null);
-    const currSelected = ref(null);
-    const localOptions = ref([]);
-    const enableWatch = ref(true);
-    const btnItemWidth = ref(0);
-    const borderSwiper = ref(null);
-    const btnContainer = ref(null);
+const router = useRouter()
+const route = useRoute()
 
-    const cssVariables = computed(() => ({
-      "--swiper-color": props.swiperColor,
-      "--icon-color": props.iconColor,
-      "--background-color": props.backgroundColor,
-    }));
+const prevSelected = ref(null)
+const currSelected = ref(null)
+const localOptions = ref([])
+const enableWatch = ref(true)
+const btnItemWidth = ref(0)
+const borderSwiper = ref(null)
+const btnContainer = ref(null)
 
-    watch(
-      () => currSelected.value,
-      (newVal) => {
-        if (borderSwiper.value) {
-          borderSwiper.value.style.transform = `translateX(${
-            btnItemWidth.value * newVal
-          }px)`;
-        }
-      }
-    );
+const cssVariables = computed(() => ({
+  '--swiper-color': props.swiperColor,
+  '--icon-color': props.iconColor,
+  '--background-color': props.backgroundColor
+}))
 
-    watch(
-      () => props.modelValue,
-      (newVal, oldVal) => {
-        if (newVal != oldVal && enableWatch.value) {
-          const target = localOptions.value.findIndex(
-            (option) => option.id == newVal
-          );
-
-          if (target > -1) {
-            handleButtonClick(localOptions.value[target], target);
-          }
-        }
-      }
-    );
-
-    function cssLoader() {
-      btnItemWidth.value = btnContainer.value[0].offsetWidth;
-      borderSwiper.value.style.width = btnItemWidth.value + "px";
+watch(
+  () => currSelected.value,
+  (newVal) => {
+    if (borderSwiper.value) {
       borderSwiper.value.style.transform = `translateX(${
+            btnItemWidth.value * newVal
+          }px)`
+    }
+  }
+)
+
+watch(
+  () => props.modelValue,
+  (newVal, oldVal) => {
+    if (newVal != oldVal && enableWatch.value) {
+      const target = localOptions.value.findIndex(
+        (option) => option.id == newVal
+      )
+
+      if (target > -1) {
+        handleButtonClick(localOptions.value[target], target)
+      }
+    }
+  }
+)
+
+function cssLoader () {
+  btnItemWidth.value = btnContainer.value[0].offsetWidth
+  borderSwiper.value.style.width = btnItemWidth.value + 'px'
+  borderSwiper.value.style.transform = `translateX(${
         btnItemWidth.value * currSelected.value
-      }px)`;
+      }px)`
+}
+function onResize () {
+  cssLoader()
+}
+
+function handleButtonClick (button, index) {
+  if (index === currSelected.value) {
+    return
+  }
+
+  currSelected.value = index
+
+  if (prevSelected.value !== null) {
+    localOptions.value[prevSelected.value].selected = false
+  }
+
+  localOptions.value[index].selected = true
+
+  prevSelected.value = currSelected.value
+  updateValue(button)
+}
+
+function updateValue (button) {
+  emit('update:modelValue', button.id)
+
+  enableWatch.value = false
+  setTimeout(() => {
+    enableWatch.value = true
+  }, 0)
+
+  if (button.path && Object.keys(button.path).length) {
+    if (props.replaceRoute) {
+      router.replace(button.path).catch(() => {})
+    } else {
+      router.push(button.path)
     }
-    function onResize() {
-      cssLoader();
-    }
+  }
+}
 
-    function handleButtonClick(button, index) {
-      if (index === currSelected.value) {
-        return;
-      }
+onMounted(() => {
+  cssLoader()
+  window.addEventListener('resize', onResize)
+})
 
-      currSelected.value = index;
+onBeforeUnmount(() => window.removeEventListener('resize', onResize))
 
-      if (prevSelected.value !== null) {
-        localOptions.value[prevSelected.value].selected = false;
-      }
-
-      localOptions.value[index].selected = true;
-
-      prevSelected.value = currSelected.value;
-      updateValue(button);
-    }
-
-    function updateValue(button) {
-      emit("update:modelValue", button.id);
-
-      enableWatch.value = false;
-      setTimeout(() => {
-        enableWatch.value = true;
-      }, 0);
-
-      if (button.path && Object.keys(button.path).length) {
-        if (props.replaceRoute) {
-          router.replace(button.path).catch(() => {});
-        } else {
-          router.push(button.path);
-        }
-      }
-    }
-
-    onMounted(() => {
-      cssLoader();
-      window.addEventListener("resize", onResize);
-    });
-
-    onBeforeUnmount(() => window.removeEventListener("resize", onResize));
-
-    localOptions.value = props.options.slice();
-    const index = localOptions.value.findIndex(
-      (item) =>
-        item.id == props.modelValue ||
+localOptions.value = props.options.slice()
+const index = localOptions.value.findIndex(
+  (item) =>
+    item.id == props.modelValue ||
         (item.path || {}).name == (route || {}).name
-    );
+)
 
-    if (index > -1) {
-      currSelected.value = index;
-      prevSelected.value = index;
+if (index > -1) {
+  currSelected.value = index
+  prevSelected.value = index
 
-      localOptions.value[index].selected = true;
-    }
-
-    return {
-      cssVariables,
-      handleButtonClick,
-      localOptions,
-
-      borderSwiper,
-      btnContainer,
-    };
-  },
-};
+  localOptions.value[index].selected = true
+}
 </script>
 
 <style scoped>

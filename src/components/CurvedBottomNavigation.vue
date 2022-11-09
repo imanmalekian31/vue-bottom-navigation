@@ -5,7 +5,7 @@
         v-for="(button, index) in localOptions"
         :key="`label-${index}`"
         :class="{
-          [`btn-item-${index} labels`]: true,
+          [`btn-item-${index} labels btn-item`]: true,
           ['checked']: button.isActive,
           ['unchecked']: !button.isActive,
         }"
@@ -78,7 +78,17 @@ import {
 } from "vue";
 import { useRouter } from "vue-router";
 
-import { CurvedProps, CurvedOption, Child } from "../types";
+import type { CurvedOption, Child } from "@/types";
+
+type CurvedProps = {
+  modelValue: number | string | null;
+  options: CurvedOption[];
+  foregroundColor?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  badgeColor?: string;
+  replaceRoute?: boolean;
+};
 
 const props = withDefaults(defineProps<CurvedProps>(), {
   modelValue: null,
@@ -158,25 +168,23 @@ function cssLoader() {
     window.innerWidth;
 
   props.options.forEach((item, index) => {
+    const translateX = ((item.childs || []).length * 45) / 2 - 35;
+    const endsClassName = `.btn-item-${index}.checked .btn-class-showable .btn-child-parent`;
     if (index === 0 && hasChild(item)) {
-      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent{transform:translateX(${
-        ((item.childs || []).length * 45) / 2 - 35
-      }px);transition:transform 500ms ease 300ms;}`;
+      customStyle += `${endsClassName}{transform:translateX(${translateX}px)}`;
     }
 
     if (index === props.options.length - 1 && hasChild(item)) {
-      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent {transform:translateX(-${
-        ((item.childs || []).length * 45) / 2 - 35
-      }px);transition:transform 500ms ease 300ms;}`;
+      customStyle += `${endsClassName}{transform:translateX(-${translateX}px)}`;
     }
 
-    customStyle += `.btn-item-${index}{padding:10px;transition: transform 100ms ease;width:${
-      containerWidth / props.options.length
-    }px !important;display:flex;justify-content:center;align-items:center;position:relative;z-index:10;}`;
-    customStyle += `.btn-item-${index}.checked ~ #sweep{transform:translateX(${
+    const itemWidth = containerWidth / props.options.length;
+    customStyle += `.btn-item-${index}{width:${itemWidth}px !important;}`;
+
+    const sweepTranslateX =
       (index * containerWidth) / props.options.length +
-      containerWidth / props.options.length / 4
-    }px);transition:transform 500ms ease;}`;
+      containerWidth / props.options.length / 4;
+    customStyle += `.btn-item-${index}.checked ~ #sweep{transform:translateX(${sweepTranslateX}px)}`;
 
     if (hasChild(item)) {
       (item.childs || []).forEach((child, idx) => {
@@ -184,7 +192,7 @@ function cssLoader() {
           idx + 1
         }){transform:translateX(${
           (0.5 + idx) * 45 - ((item.childs || []).length * 45) / 2
-        }px);transition:transform 500ms ease 300ms;}`;
+        }px)}`;
       });
     }
   });
@@ -536,5 +544,28 @@ input {
     width: 100%;
     height: 40px;
   }
+}
+
+/* shared */
+.btn-item {
+  padding: 10px;
+  transition: transform 100ms ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-item.checked .btn-class-showable .btn-child-parent {
+  transition: transform 500ms ease 300ms;
+}
+
+.btn-item.checked ~ #sweep {
+  transition: transform 500ms ease;
+}
+
+.btn-item.checked .btn-class-showable .btn-child {
+  transition: transform 500ms ease 300ms;
 }
 </style>

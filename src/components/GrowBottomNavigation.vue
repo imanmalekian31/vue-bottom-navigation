@@ -44,7 +44,14 @@
 import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-import { GrowOption, GrowProps } from "../types";
+import type { GrowOption } from "@/types";
+
+type GrowProps = {
+  modelValue: number | string | null;
+  options: GrowOption[];
+  color?: string;
+  replaceRoute?: boolean;
+}
 
 const props = withDefaults(defineProps<GrowProps>(), {
   modelValue: null,

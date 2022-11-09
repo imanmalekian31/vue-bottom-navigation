@@ -40,7 +40,16 @@
 import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-import { WindowsOption, WindowsProps } from "@/types";
+import type { WindowsOption } from "@/types";
+
+type WindowsProps = {
+  modelValue: number | string | null;
+  options: WindowsOption[];
+  swiperColor?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  replaceRoute?: boolean;
+}
 
 const props = withDefaults(defineProps<WindowsProps>(), {
   modelValue: null,

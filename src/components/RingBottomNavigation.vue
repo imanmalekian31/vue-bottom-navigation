@@ -43,7 +43,17 @@
 import { ref, computed, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-import { RingOption, RingProps } from "../types";
+import type { RingOption } from "@/types";
+
+type RingProps = {
+  modelValue: number | string | null;
+  options: RingOption[];
+  titleColor?: string;
+  borderColor?: string;
+  badgeColor?: string;
+  iconColor?: string;
+  replaceRoute?: boolean;
+}
 
 const props = withDefaults(defineProps<RingProps>(), {
   modelValue: null,

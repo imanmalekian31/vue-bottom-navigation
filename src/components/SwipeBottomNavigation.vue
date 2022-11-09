@@ -33,7 +33,16 @@
 import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-import { SwipeOption, SwipeProps } from "../types";
+import type { SwipeOption } from "@/types";
+
+type SwipeProps = {
+  modelValue: number | string | null;
+  options: SwipeOption[];
+  swiperColor?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  replaceRoute?: boolean;
+}
 
 const props = withDefaults(defineProps<SwipeProps>(), {
   modelValue: null,

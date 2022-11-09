@@ -75,7 +75,6 @@ import {
   onMounted,
   onBeforeUnmount,
   nextTick,
-  PropType,
 } from "vue";
 import { useRouter } from "vue-router";
 
@@ -206,18 +205,18 @@ function cssLoader() {
 
   head.appendChild(style);
 }
-function handleLabelClick(button) {
+function handleLabelClick(button: CurvedOption) {
   if (!showable.value || button.isActive) {
     toggleClass();
   }
 
   updateValue(button, hasChild(button));
 }
-function handleChildClick(button) {
+function handleChildClick(button: CurvedOption) {
   updateValue(button);
   toggleClass();
 }
-function updateValue(button, prevent = false) {
+function updateValue(button: CurvedOption, prevent = false) {
   localOptions.value.forEach(
     (option: CurvedOption) => (option.isActive = isActive(option, button.id))
   );
@@ -241,10 +240,10 @@ function updateValue(button, prevent = false) {
 function toggleClass() {
   showable.value = !showable.value;
 }
-function isActive(button, value = props.modelValue) {
+function isActive(button: CurvedOption, value = props.modelValue): boolean {
   return (
     button.id == value ||
-    (button.childs || []).find((child) => child.id == value)
+    Boolean((button.childs || []).find((child) => child.id == value))
   );
 }
 function onResize() {
@@ -256,8 +255,8 @@ function onResize() {
   cssLoader();
 }
 
-function hasChild(button) {
-  return (button.childs || []).length;
+function hasChild(button: CurvedOption): boolean {
+  return Boolean((button.childs || []).length);
 }
 
 onMounted(() => {

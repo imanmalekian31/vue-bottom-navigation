@@ -45,11 +45,11 @@ import type { WindowsOption } from "@/types";
 type WindowsProps = {
   modelValue: number | string | null;
   options: WindowsOption[];
-  swiperColor?: string;
+  borderColor?: string;
   backgroundColor?: string;
-  iconColor?: string;
+  badgeColor?: string;
   replaceRoute?: boolean;
-}
+};
 
 const props = withDefaults(defineProps<WindowsProps>(), {
   modelValue: null,
@@ -131,7 +131,7 @@ function updateValue(button: WindowsOption) {
 }
 
 localOptions.value = props.options.slice();
-const index = localOptions.value.findIndex((item) => {
+const index = localOptions.value.findIndex((item: WindowsOption) => {
   if (item.id == props.modelValue) {
     return true;
   }

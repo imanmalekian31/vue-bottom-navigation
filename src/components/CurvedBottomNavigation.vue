@@ -170,12 +170,14 @@ function cssLoader() {
   props.options.forEach((item, index) => {
     const translateX = ((item.childs || []).length * 45) / 2 - 35;
     const endsClassName = `.btn-item-${index}.checked .btn-class-showable .btn-child-parent`;
-    if (index === 0 && hasChild(item)) {
-      customStyle += `${endsClassName}{transform:translateX(${translateX}px)}`;
-    }
+    if ((item.childs || []).length > 1) {
+      if (index === 0 && hasChild(item)) {
+        customStyle += `${endsClassName}{transform:translateX(${translateX}px)}`;
+      }
 
-    if (index === props.options.length - 1 && hasChild(item)) {
-      customStyle += `${endsClassName}{transform:translateX(-${translateX}px)}`;
+      if (index === props.options.length - 1 && hasChild(item)) {
+        customStyle += `${endsClassName}{transform:translateX(-${translateX}px)}`;
+      }
     }
 
     const itemWidth = containerWidth / props.options.length;
@@ -204,9 +206,8 @@ function cssLoader() {
   const style = document.createElement("style");
   style.id = "bottom-navigation-style";
 
-  customStyle = customStyle.trim();
-  if (style.style) {
-    style.style.cssText = customStyle;
+  if (style.styleSheet) {
+    style.styleSheet.cssText = customStyle;
   } else {
     style.appendChild(document.createTextNode(customStyle));
   }

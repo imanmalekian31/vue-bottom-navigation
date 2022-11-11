@@ -53,7 +53,7 @@ type RingProps = {
   badgeColor?: string;
   iconColor?: string;
   replaceRoute?: boolean;
-}
+};
 
 const props = withDefaults(defineProps<RingProps>(), {
   modelValue: null,
@@ -165,6 +165,7 @@ if (index > -1) {
   align-items: flex-end;
   direction: ltr;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 64px;

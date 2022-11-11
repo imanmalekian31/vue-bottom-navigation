@@ -303,6 +303,7 @@ input {
   display: flex;
   align-items: flex-end;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 60px;

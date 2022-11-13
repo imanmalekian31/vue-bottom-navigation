@@ -1,7 +1,12 @@
 export interface Path {
-  name: string;
-  query: any;
-  params: any;
+  name?: string;
+  path?: string;
+  params?: {
+    [k in string]: string;
+  };
+  query?: {
+    [k in string]: string;
+  };
 }
 
 export interface Child {

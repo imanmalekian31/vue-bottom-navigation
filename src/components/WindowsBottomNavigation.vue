@@ -19,7 +19,7 @@
             <i :class="`${button.icon}`" />
           </slot>
 
-          <div v-if="button.badge > 0" class="wn-btn-badge">
+          <div v-if="button.badge" class="wn-btn-badge">
             {{ button.badge }}
           </div>
         </div>
@@ -36,50 +36,44 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-const props = defineProps({
-  modelValue: {
-    default: null
-  },
-  options: {
-    type: Array,
-    required: true
-  },
-  borderColor: {
-    type: String,
-    default: '#9B9B9B'
-  },
-  backgroundColor: {
-    type: String,
-    default: '#FFFFFF'
-  },
-  badgeColor: {
-    type: String,
-    default: '#828282'
-  },
-  replaceRoute: {
-    type: Boolean,
-    default: false
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+import type { WindowsOption } from "@/types";
 
-const router = useRouter()
-const route = useRoute()
+type WindowsProps = {
+  modelValue: number | string | null;
+  options: WindowsOption[];
+  borderColor?: string;
+  backgroundColor?: string;
+  badgeColor?: string;
+  replaceRoute?: boolean;
+};
 
-const prevSelected = ref(null)
-const currSelected = ref(null)
-const localOptions = ref([])
-const enableWatch = ref(true)
+const props = withDefaults(defineProps<WindowsProps>(), {
+  modelValue: null,
+  options: () => [],
+  borderColor: "#9B9B9B",
+  backgroundColor: "#FFFFFF",
+  badgeColor: "#828282",
+  replaceRoute: false,
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const router = useRouter();
+const route = useRoute();
+
+const prevSelected = ref<number>(0);
+const currSelected = ref<number>(0);
+const localOptions = ref<WindowsOption[]>([]);
+const enableWatch = ref<boolean>(true);
 
 const cssVariables = computed(() => ({
-  '--border-color': props.borderColor,
-  '--background-color': props.backgroundColor,
-  '--badge-color': props.badgeColor
-}))
+  "--border-color": props.borderColor,
+  "--background-color": props.backgroundColor,
+  "--badge-color": props.badgeColor,
+}));
 
 watch(
   () => props.modelValue,
@@ -87,67 +81,73 @@ watch(
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
         (option) => option.id == newVal
-      )
+      );
 
       if (target > -1) {
-        handleButtonClick(localOptions.value[target], target)
+        handleButtonClick(localOptions.value[target], target);
       }
     }
   }
-)
+);
 
-function handleButtonClick (button, index) {
+function handleButtonClick(button: WindowsOption, index: number) {
   if (index === currSelected.value) {
-    return
+    return;
   }
 
-  currSelected.value = index
+  currSelected.value = index;
 
   if (prevSelected.value !== null) {
-    const temp = prevSelected.value
+    const temp = prevSelected.value;
     setTimeout(() => {
-      localOptions.value[temp].deselect = false
-    }, 300)
+      localOptions.value[temp].deselect = false;
+    }, 300);
 
-    localOptions.value[prevSelected.value].selected = false
-    localOptions.value[prevSelected.value].deselect = true
+    localOptions.value[prevSelected.value].selected = false;
+    localOptions.value[prevSelected.value].deselect = true;
   }
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 
-  prevSelected.value = currSelected.value
-  updateValue(button)
+  prevSelected.value = currSelected.value;
+  updateValue(button);
 }
 
-function updateValue (button) {
-  emit('update:modelValue', button.id)
+function updateValue(button: WindowsOption) {
+  emit("update:modelValue", button.id);
 
-  enableWatch.value = false
+  enableWatch.value = false;
   setTimeout(() => {
-    enableWatch.value = true
-  }, 0)
+    enableWatch.value = true;
+  }, 0);
 
   if (button.path && Object.keys(button.path).length) {
     if (props.replaceRoute) {
-      router.replace(button.path).catch(() => {})
+      router.replace(button.path).catch(() => {});
     } else {
-      router.push(button.path)
+      router.push(button.path);
     }
   }
 }
 
-localOptions.value = props.options.slice()
-const index = localOptions.value.findIndex(
-  (item) =>
-    item.id == props.modelValue ||
-        (item.path || {}).name == (route || {}).name
-)
+localOptions.value = props.options.slice();
+const index = localOptions.value.findIndex((item: WindowsOption) => {
+  if (item.id == props.modelValue) {
+    return true;
+  }
+
+  if (typeof item.path === "object") {
+    return (item.path || {}).name == (route || {}).name;
+  }
+
+  return false;
+});
 
 if (index > -1) {
-  currSelected.value = index
-  prevSelected.value = index
+  currSelected.value = index;
+  prevSelected.value = index;
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 }
 </script>
 
@@ -158,6 +158,7 @@ if (index > -1) {
   align-items: flex-end;
   direction: ltr;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 64px;

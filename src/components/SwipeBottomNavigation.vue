@@ -3,7 +3,7 @@
     <div
       v-for="(button, index) in localOptions"
       :key="`simple-btn-${index}`"
-      ref="btnContainer"
+      ref="btnContainerRef"
       class="sm-btn-container"
       @click="handleButtonClick(button, index)"
     >
@@ -25,68 +25,62 @@
         </div>
       </div>
     </div>
-    <div ref="borderSwiper" class="border-swiper" />
+    <div ref="borderSwiperRef" class="border-swiper" />
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-const props = defineProps({
-  modelValue: {
-    default: null
-  },
-  options: {
-    type: Array,
-    required: true
-  },
-  backgroundColor: {
-    type: String,
-    default: '#FFFFFF'
-  },
-  iconColor: {
-    type: String,
-    default: '#8066C7'
-  },
-  swiperColor: {
-    type: String,
-    default: '#8066C7'
-  },
-  replaceRoute: {
-    type: Boolean,
-    default: false
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+import type { SwipeOption } from "@/types";
 
-const router = useRouter()
-const route = useRoute()
+type SwipeProps = {
+  modelValue: number | string | null;
+  options: SwipeOption[];
+  swiperColor?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  replaceRoute?: boolean;
+};
 
-const prevSelected = ref(null)
-const currSelected = ref(null)
-const localOptions = ref([])
-const enableWatch = ref(true)
-const btnItemWidth = ref(0)
-const borderSwiper = ref(null)
-const btnContainer = ref(null)
+const props = withDefaults(defineProps<SwipeProps>(), {
+  modelValue: null,
+  options: () => [],
+  backgroundColor: "#FFFFFF",
+  iconColor: "#8066C7",
+  swiperColor: "#8066C7",
+  replaceRoute: false,
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const router = useRouter();
+const route = useRoute();
+
+const prevSelected = ref<number>(0);
+const currSelected = ref<number>(0);
+const localOptions = ref<SwipeOption[]>([]);
+const enableWatch = ref<boolean>(true);
+const btnItemWidth = ref<number>(0);
+const borderSwiperRef = ref<HTMLElement>();
+const btnContainerRef = ref<HTMLElement>();
 
 const cssVariables = computed(() => ({
-  '--swiper-color': props.swiperColor,
-  '--icon-color': props.iconColor,
-  '--background-color': props.backgroundColor
-}))
+  "--swiper-color": props.swiperColor,
+  "--icon-color": props.iconColor,
+  "--background-color": props.backgroundColor,
+}));
 
 watch(
   () => currSelected.value,
   (newVal) => {
-    if (borderSwiper.value) {
-      borderSwiper.value.style.transform = `translateX(${
-            btnItemWidth.value * newVal
-          }px)`
+    if (borderSwiperRef.value) {
+      borderSwiperRef.value.style.transform = `translateX(${
+        btnItemWidth.value * newVal
+      }px)`;
     }
   }
-)
+);
 
 watch(
   () => props.modelValue,
@@ -94,79 +88,89 @@ watch(
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
         (option) => option.id == newVal
-      )
+      );
 
       if (target > -1) {
-        handleButtonClick(localOptions.value[target], target)
+        handleButtonClick(localOptions.value[target], target);
       }
     }
   }
-)
+);
 
-function cssLoader () {
-  btnItemWidth.value = btnContainer.value[0].offsetWidth
-  borderSwiper.value.style.width = btnItemWidth.value + 'px'
-  borderSwiper.value.style.transform = `translateX(${
-        btnItemWidth.value * currSelected.value
-      }px)`
+function cssLoader() {
+  if (btnContainerRef.value && Array.isArray(btnContainerRef.value)) {
+    btnItemWidth.value = btnContainerRef.value[0].offsetWidth;
+  }
+  if (borderSwiperRef.value) {
+    borderSwiperRef.value.style.width = btnItemWidth.value + "px";
+    borderSwiperRef.value.style.transform = `translateX(${
+      btnItemWidth.value * currSelected.value
+    }px)`;
+  }
 }
-function onResize () {
-  cssLoader()
+function onResize() {
+  cssLoader();
 }
 
-function handleButtonClick (button, index) {
+function handleButtonClick(button: SwipeOption, index: number) {
   if (index === currSelected.value) {
-    return
+    return;
   }
 
-  currSelected.value = index
+  currSelected.value = index;
 
   if (prevSelected.value !== null) {
-    localOptions.value[prevSelected.value].selected = false
+    localOptions.value[prevSelected.value].selected = false;
   }
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 
-  prevSelected.value = currSelected.value
-  updateValue(button)
+  prevSelected.value = currSelected.value;
+  updateValue(button);
 }
 
-function updateValue (button) {
-  emit('update:modelValue', button.id)
+function updateValue(button: SwipeOption) {
+  emit("update:modelValue", button.id);
 
-  enableWatch.value = false
+  enableWatch.value = false;
   setTimeout(() => {
-    enableWatch.value = true
-  }, 0)
+    enableWatch.value = true;
+  }, 0);
 
   if (button.path && Object.keys(button.path).length) {
     if (props.replaceRoute) {
-      router.replace(button.path).catch(() => {})
+      router.replace(button.path).catch(() => {});
     } else {
-      router.push(button.path)
+      router.push(button.path);
     }
   }
 }
 
 onMounted(() => {
-  cssLoader()
-  window.addEventListener('resize', onResize)
-})
+  cssLoader();
+  window.addEventListener("resize", onResize);
+});
 
-onBeforeUnmount(() => window.removeEventListener('resize', onResize))
+onBeforeUnmount(() => window.removeEventListener("resize", onResize));
 
-localOptions.value = props.options.slice()
-const index = localOptions.value.findIndex(
-  (item) =>
-    item.id == props.modelValue ||
-        (item.path || {}).name == (route || {}).name
-)
+localOptions.value = props.options.slice();
+const index = localOptions.value.findIndex((item) => {
+  if (item.id == props.modelValue) {
+    return true;
+  }
+
+  if (typeof item.path === "object") {
+    return (item.path || {}).name == (route || {}).name;
+  }
+
+  return false;
+});
 
 if (index > -1) {
-  currSelected.value = index
-  prevSelected.value = index
+  currSelected.value = index;
+  prevSelected.value = index;
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 }
 </script>
 
@@ -177,6 +181,7 @@ if (index > -1) {
   align-items: flex-end;
   direction: ltr;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 64px;

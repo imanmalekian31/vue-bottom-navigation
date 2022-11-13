@@ -5,7 +5,7 @@
         v-for="(button, index) in localOptions"
         :key="`label-${index}`"
         :class="{
-          [`btn-item-${index} labels`]: true,
+          [`btn-item-${index} labels btn-item`]: true,
           ['checked']: button.isActive,
           ['unchecked']: !button.isActive,
         }"
@@ -67,93 +67,85 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import {
   ref,
   computed,
   watch,
   onMounted,
   onBeforeUnmount,
-  nextTick
-} from 'vue'
-import { useRouter } from 'vue-router'
+  nextTick,
+} from "vue";
+import { useRouter } from "vue-router";
 
-const props = defineProps({
-  modelValue: {
-    default: null
-  },
-  options: {
-    type: Array,
-    default: () => []
-  },
-  foregroundColor: {
-    type: String,
-    default: '#42A5F5'
-  },
-  backgroundColor: {
-    type: String,
-    default: '#FFFFFF'
-  },
-  iconColor: {
-    type: String,
-    default: '#0000008A'
-  },
-  badgeColor: {
-    type: String,
-    default: '#FBC02D'
-  },
-  replaceRoute: {
-    type: Boolean,
-    default: false
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+import type { CurvedOption, Child } from "@/types";
 
-const router = useRouter()
+type CurvedProps = {
+  modelValue: number | string | null;
+  options: CurvedOption[];
+  foregroundColor?: string;
+  backgroundColor?: string;
+  iconColor?: string;
+  badgeColor?: string;
+  replaceRoute?: boolean;
+};
 
-const localOptions = ref([])
-const showable = ref(false)
-const enableWatch = ref(true)
+const props = withDefaults(defineProps<CurvedProps>(), {
+  modelValue: null,
+  options: () => [],
+  foregroundColor: "#42A5F5",
+  backgroundColor: "#FFFFFF",
+  iconColor: "#0000008A",
+  badgeColor: "#FBC02D",
+  replaceRoute: false,
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const router = useRouter();
+
+const localOptions = ref<CurvedOption[]>([]);
+const showable = ref<boolean>(false);
+const enableWatch = ref<boolean>(true);
 
 const cssVariables = computed(() => {
   const countChilds = (
-    (localOptions.value.find((option) => option.isActive) || {}).childs ||
-        []
-  ).length
+    (localOptions.value.find((option: CurvedOption) => option.isActive) || {})
+      .childs || []
+  ).length;
 
   const styles = {
-    '--color-foreground': props.foregroundColor,
-    '--color-background': props.backgroundColor,
-    '--color-icon': props.iconColor,
-    '--color-badge': props.badgeColor,
-    '--width-parent': `${countChilds * 45}px`
-  }
+    "--color-foreground": props.foregroundColor,
+    "--color-background": props.backgroundColor,
+    "--color-icon": props.iconColor,
+    "--color-badge": props.badgeColor,
+    "--width-parent": `${countChilds * 45}px`,
+  };
 
-  return styles
-})
+  return styles;
+});
 const hasActiveClass = computed(() => {
-  return localOptions.value.find((option) => option.isActive)
-})
+  return localOptions.value.find((option: CurvedOption) => option.isActive);
+});
 
 watch(
   () => props.modelValue,
   (newVal, oldVal) => {
     if (newVal != oldVal && enableWatch.value) {
-      const childs = []
-      localOptions.value.forEach((option) => {
+      const childs: Child[] = [];
+      localOptions.value.forEach((option: CurvedOption) => {
         if (option.childs) {
-          childs.push(...option.childs)
+          childs.push(...option.childs);
         }
-      })
+      });
       const target = [...localOptions.value, ...childs].find(
         (option) => option.id == newVal
-      )
+      );
       if (target) {
-        updateValue(target, hasChild(target))
+        updateValue(target, hasChild(target));
       }
     }
   }
-)
+);
 
 watch(
   () => props.options,
@@ -161,120 +153,132 @@ watch(
     if (newVal) {
       localOptions.value = newVal.map((option) => ({
         ...option,
-        isActive: isActive(option)
-      }))
-      cssLoader()
+        isActive: isActive(option),
+      }));
+      cssLoader();
     }
   },
   { deep: true }
-)
+);
 
-function cssLoader () {
-  let customStyle = ''
+function cssLoader() {
+  let customStyle = "";
   const containerWidth =
-        document.querySelector('.btn-container').offsetWidth ||
-        window.innerWidth
+    (document.querySelector(".btn-container") as HTMLElement).offsetWidth ||
+    window.innerWidth;
 
   props.options.forEach((item, index) => {
-    if (index === 0 && hasChild(item)) {
-      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent{transform:translateX(${(item.childs.length * 45) / 2 - 35}px);transition:transform 500ms ease 300ms;}`
+    const translateX = ((item.childs || []).length * 45) / 2 - 35;
+    const endsClassName = `.btn-item-${index}.checked .btn-class-showable .btn-child-parent`;
+    if ((item.childs || []).length > 1) {
+      if (index === 0 && hasChild(item)) {
+        customStyle += `${endsClassName}{transform:translateX(${translateX}px)}`;
+      }
+
+      if (index === props.options.length - 1 && hasChild(item)) {
+        customStyle += `${endsClassName}{transform:translateX(-${translateX}px)}`;
+      }
     }
 
-    if (index === props.options.length - 1 && hasChild(item)) {
-      customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child-parent {transform:translateX(-${(item.childs.length * 45) / 2 - 35}px);transition:transform 500ms ease 300ms;}`
-    }
+    const itemWidth = containerWidth / props.options.length;
+    customStyle += `.btn-item-${index}{width:${itemWidth}px !important;}`;
 
-    customStyle += `.btn-item-${index}{padding:10px;transition: transform 100ms ease;width:${containerWidth / props.options.length}px !important;display:flex;justify-content:center;align-items:center;position:relative;z-index:10;}`
-    customStyle += `.btn-item-${index}.checked ~ #sweep{transform:translateX(${(index * containerWidth) / props.options.length + containerWidth / props.options.length / 4}px);transition:transform 500ms ease;}`
+    const sweepTranslateX =
+      (index * containerWidth) / props.options.length +
+      containerWidth / props.options.length / 4;
+    customStyle += `.btn-item-${index}.checked ~ #sweep{transform:translateX(${sweepTranslateX}px)}`;
 
     if (hasChild(item)) {
-      item.childs.forEach((child, idx) => {
-        customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${idx + 1}){transform:translateX(${(0.5 + idx) * 45 - (item.childs.length * 45) / 2}px);transition:transform 500ms ease 300ms;}`
-      })
+      (item.childs || []).forEach((child, idx) => {
+        customStyle += `.btn-item-${index}.checked .btn-class-showable .btn-child:nth-child(${
+          idx + 1
+        }){transform:translateX(${
+          (0.5 + idx) * 45 - ((item.childs || []).length * 45) / 2
+        }px)}`;
+      });
     }
-  })
+  });
 
-  document.getElementById('sweep').style.left = `
-      ${containerWidth / props.options.length / 4 - 135 / 2}px`
+  (document.getElementById("sweep") as HTMLElement).style.left = `
+      ${containerWidth / props.options.length / 4 - 135 / 2}px`;
 
-  const head = document.getElementsByTagName('head')[0]
-  const style = document.createElement('style')
-  style.id = 'bottom-navigation-style'
+  const head = document.getElementsByTagName("head")[0];
+  const style = document.createElement("style");
+  style.id = "bottom-navigation-style";
 
-  customStyle = customStyle.trim()
   if (style.styleSheet) {
-    style.styleSheet.cssText = customStyle
+    style.styleSheet.cssText = customStyle;
   } else {
-    style.appendChild(document.createTextNode(customStyle))
+    style.appendChild(document.createTextNode(customStyle));
   }
 
-  head.appendChild(style)
+  head.appendChild(style);
 }
-function handleLabelClick (button) {
+function handleLabelClick(button: CurvedOption) {
   if (!showable.value || button.isActive) {
-    toggleClass()
+    toggleClass();
   }
 
-  updateValue(button, hasChild(button))
+  updateValue(button, hasChild(button));
 }
-function handleChildClick (button) {
-  updateValue(button)
-  toggleClass()
+function handleChildClick(button: CurvedOption) {
+  updateValue(button);
+  toggleClass();
 }
-function updateValue (button, prevent = false) {
+function updateValue(button: CurvedOption, prevent = false) {
   localOptions.value.forEach(
-    (option) => (option.isActive = isActive(option, button.id))
-  )
+    (option: CurvedOption) => (option.isActive = isActive(option, button.id))
+  );
 
   if (!prevent) {
-    emit('update:modelValue', button.id)
-    enableWatch.value = false
+    emit("update:modelValue", button.id);
+    enableWatch.value = false;
     setTimeout(() => {
-      enableWatch.value = true
-    }, 0)
+      enableWatch.value = true;
+    }, 0);
 
     if (button.path && Object.keys(button.path).length) {
       if (props.replaceRoute) {
-        router.replace(button.path).catch(() => {})
+        router.replace(button.path).catch(() => {});
       } else {
-        router.push(button.path)
+        router.push(button.path);
       }
     }
   }
 }
-function toggleClass () {
-  showable.value = !showable.value
+function toggleClass() {
+  showable.value = !showable.value;
 }
-function isActive (button, value = props.modelValue) {
+function isActive(button: CurvedOption, value = props.modelValue): boolean {
   return (
     button.id == value ||
-        (button.childs || []).find((child) => child.id == value)
-  )
+    Boolean((button.childs || []).find((child) => child.id == value))
+  );
 }
-function onResize () {
+function onResize() {
   nextTick(() => {
-    const styleElement = document.getElementById('bottom-navigation-style')
-    styleElement && styleElement.remove()
-  })
+    const styleElement = document.getElementById("bottom-navigation-style");
+    styleElement && styleElement.remove();
+  });
 
-  cssLoader()
+  cssLoader();
 }
 
-function hasChild (button) {
-  return (button.childs || []).length
+function hasChild(button: CurvedOption): boolean {
+  return Boolean((button.childs || []).length);
 }
 
 onMounted(() => {
-  cssLoader()
-  window.addEventListener('resize', onResize)
-})
+  cssLoader();
+  window.addEventListener("resize", onResize);
+});
 
-onBeforeUnmount(() => window.removeEventListener('resize', onResize))
+onBeforeUnmount(() => window.removeEventListener("resize", onResize));
 
-localOptions.value = props.options.map((option) => ({
+localOptions.value = props.options.map((option: CurvedOption) => ({
   ...option,
-  isActive: isActive(option)
-}))
+  isActive: isActive(option),
+}));
 </script>
 
 <style scoped>
@@ -299,6 +303,7 @@ input {
   display: flex;
   align-items: flex-end;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 60px;
@@ -541,5 +546,28 @@ input {
     width: 100%;
     height: 40px;
   }
+}
+
+/* shared */
+.btn-item {
+  padding: 10px;
+  transition: transform 100ms ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  z-index: 10;
+}
+
+.btn-item.checked .btn-class-showable .btn-child-parent {
+  transition: transform 500ms ease 300ms;
+}
+
+.btn-item.checked ~ #sweep {
+  transition: transform 500ms ease;
+}
+
+.btn-item.checked .btn-class-showable .btn-child {
+  transition: transform 500ms ease 300ms;
 }
 </style>

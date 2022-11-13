@@ -40,55 +40,53 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+<script setup lang="ts">
+import { ref, computed, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
-const props = defineProps({
-  modelValue: {
-    default: null
-  },
-  options: {
-    type: Array,
-    default: () => []
-  },
-  color: {
-    type: String,
-    default: '#74cbbb'
-  },
-  replaceRoute: {
-    type: Boolean,
-    default: false
-  }
-})
-const emit = defineEmits(['update:modelValue'])
+import type { GrowOption } from "@/types";
 
-const router = useRouter()
-const route = useRoute()
+type GrowProps = {
+  modelValue: number | string | null;
+  options: GrowOption[];
+  color?: string;
+  replaceRoute?: boolean;
+};
 
-const prevSelected = ref(null)
-const currSelected = ref(null)
-const localOptions = ref([])
-const enableWatch = ref(true)
+const props = withDefaults(defineProps<GrowProps>(), {
+  modelValue: null,
+  options: () => [],
+  color: "#74CBBB",
+  replaceRoute: false,
+});
+const emit = defineEmits(["update:modelValue"]);
+
+const router = useRouter();
+const route = useRoute();
+
+const prevSelected = ref<number>(0);
+const currSelected = ref<number>(0);
+const localOptions = ref<GrowOption[]>([]);
+const enableWatch = ref<boolean>(true);
 
 const cssVariables = computed(() => {
-  const activeTitle = (localOptions.value[currSelected.value] || {}).title
-  let activeWidth = 95
+  const activeTitle = (localOptions.value[currSelected.value] || {}).title;
+  let activeWidth = 95;
   if (activeTitle && activeTitle.length * 15 > 110) {
-    activeWidth = 95 + (activeTitle.length * 15 - 110) / 2
+    activeWidth = 95 + (activeTitle.length * 15 - 110) / 2;
   }
 
   const mainColor =
-        (localOptions.value[currSelected.value] || {}).color || props.color
+    (localOptions.value[currSelected.value] || {}).color || props.color;
 
   const styles = {
-    '--color': mainColor,
-    '--color-background': mainColor + '30',
-    '--active-width': `${activeWidth}px`
-  }
+    "--color": mainColor,
+    "--color-background": mainColor + "30",
+    "--active-width": `${activeWidth}px`,
+  };
 
-  return styles
-})
+  return styles;
+});
 
 watch(
   () => props.modelValue,
@@ -96,61 +94,67 @@ watch(
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
         (option) => option.id == newVal
-      )
+      );
 
       if (target > -1) {
-        handleButtonClick(localOptions.value[target], target)
+        handleButtonClick(localOptions.value[target], target);
       }
     }
   }
-)
+);
 
-function handleButtonClick (button, index) {
+function handleButtonClick(button: GrowOption, index: number) {
   if (index === currSelected.value) {
-    return
+    return;
   }
 
-  currSelected.value = index
+  currSelected.value = index;
 
   if (prevSelected.value !== null) {
-    localOptions.value[prevSelected.value].selected = false
+    localOptions.value[prevSelected.value].selected = false;
   }
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 
-  prevSelected.value = currSelected.value
-  updateValue(button)
+  prevSelected.value = currSelected.value;
+  updateValue(button);
 }
 
-function updateValue (button) {
-  emit('update:modelValue', button.id)
+function updateValue(button: GrowOption) {
+  emit("update:modelValue", button.id);
 
-  enableWatch.value = false
+  enableWatch.value = false;
   setTimeout(() => {
-    enableWatch.value = true
-  }, 0)
+    enableWatch.value = true;
+  }, 0);
 
   if (button.path && Object.keys(button.path).length) {
     if (props.replaceRoute) {
-      router.replace(button.path).catch(() => {})
+      router.replace(button.path).catch(() => {});
     } else {
-      router.push(button.path)
+      router.push(button.path);
     }
   }
 }
 
-localOptions.value = props.options.slice()
-const index = localOptions.value.findIndex(
-  (item) =>
-    item.id == props.modelValue ||
-        (item.path || {}).name == (route || {}).name
-)
+localOptions.value = props.options.slice();
+const index = localOptions.value.findIndex((item: GrowOption) => {
+  if (item.id == props.modelValue) {
+    return true;
+  }
+
+  if (typeof item.path === "object") {
+    return (item.path || {}).name == (route || {}).name;
+  }
+
+  return false;
+});
 
 if (index > -1) {
-  currSelected.value = index
-  prevSelected.value = index
+  currSelected.value = index;
+  prevSelected.value = index;
 
-  localOptions.value[index].selected = true
+  localOptions.value[index].selected = true;
 }
 </script>
 
@@ -161,6 +165,7 @@ if (index > -1) {
   display: flex;
   align-items: center;
   bottom: 0;
+  left: 0;
   width: 100%;
   z-index: 2147483647;
   height: 64px;

@@ -29,6 +29,7 @@
   },
   "main": "dist/library.js",
   "module": "dist/library.mjs",
+  "types": "dist/index.d.ts",
   "peerDependencies": {
     "vue": "^3.2.21"
   },

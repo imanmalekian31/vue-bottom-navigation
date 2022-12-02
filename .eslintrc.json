@@ -6,9 +6,10 @@
   "extends": [
     "eslint:recommended",
     "plugin:vue/vue3-essential",
-    "plugin:@typescript-eslint/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "plugin:prettier/recommended",
+    "prettier"
   ],
-  "overrides": [],
   "parser": "vue-eslint-parser",
   "parserOptions": {
     "parser": {
@@ -19,8 +20,23 @@
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["vue", "@typescript-eslint"],
+  "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "semi": true,
+        "singleQuote": true,
+        "printWidth": 80,
+        "tabWidth": 2,
+        "useTabs": false,
+        "trailingComma": "es5",
+        "bracketSpacing": true,
+        "jsxBracketSameLine": false,
+        "arrowParens": "avoid",
+        "endOfLine": "auto"
+      }
+    ],
     "@typescript-eslint/no-empty-function": "off"
   }
 }

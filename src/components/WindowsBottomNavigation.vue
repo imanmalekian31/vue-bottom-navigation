@@ -37,10 +37,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, computed, watch, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-import type { WindowsOption } from "@/types";
+import type { WindowsOption } from '@/types';
 
 type WindowsProps = {
   modelValue: number | string | null;
@@ -54,12 +54,12 @@ type WindowsProps = {
 const props = withDefaults(defineProps<WindowsProps>(), {
   modelValue: null,
   options: () => [],
-  borderColor: "#9B9B9B",
-  backgroundColor: "#FFFFFF",
-  badgeColor: "#828282",
+  borderColor: '#9B9B9B',
+  backgroundColor: '#FFFFFF',
+  badgeColor: '#828282',
   replaceRoute: false,
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
 const route = useRoute();
@@ -70,9 +70,9 @@ const localOptions = ref<WindowsOption[]>([]);
 const enableWatch = ref<boolean>(true);
 
 const cssVariables = computed(() => ({
-  "--border-color": props.borderColor,
-  "--background-color": props.backgroundColor,
-  "--badge-color": props.badgeColor,
+  '--border-color': props.borderColor,
+  '--background-color': props.backgroundColor,
+  '--badge-color': props.badgeColor,
 }));
 
 watch(
@@ -80,7 +80,7 @@ watch(
   (newVal, oldVal) => {
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
-        (option) => option.id == newVal
+        option => option.id == newVal
       );
 
       if (target > -1) {
@@ -88,6 +88,27 @@ watch(
       }
     }
   }
+);
+
+watch(
+  route,
+  newRoute => {
+    if (newRoute) {
+      nextTick(() => {
+        const target = localOptions.value.findIndex((option: WindowsOption) => {
+          if (typeof option.path === 'string') {
+            return option.path === newRoute.path;
+          } else {
+            return (option.path || {}).name === newRoute.name;
+          }
+        });
+        if (target > -1) {
+          handleButtonClick(localOptions.value[target], target);
+        }
+      });
+    }
+  },
+  { immediate: true }
 );
 
 function handleButtonClick(button: WindowsOption, index: number) {
@@ -114,7 +135,7 @@ function handleButtonClick(button: WindowsOption, index: number) {
 }
 
 function updateValue(button: WindowsOption) {
-  emit("update:modelValue", button.id);
+  emit('update:modelValue', button.id);
 
   enableWatch.value = false;
   setTimeout(() => {
@@ -136,7 +157,7 @@ const index = localOptions.value.findIndex((item: WindowsOption) => {
     return true;
   }
 
-  if (typeof item.path === "object") {
+  if (typeof item.path === 'object') {
     return (item.path || {}).name == (route || {}).name;
   }
 

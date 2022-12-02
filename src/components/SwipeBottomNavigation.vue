@@ -30,10 +30,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import {
+  ref,
+  computed,
+  watch,
+  nextTick,
+  onMounted,
+  onBeforeUnmount,
+} from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-import type { SwipeOption } from "@/types";
+import type { SwipeOption } from '@/types';
 
 type SwipeProps = {
   modelValue: number | string | null;
@@ -47,12 +54,12 @@ type SwipeProps = {
 const props = withDefaults(defineProps<SwipeProps>(), {
   modelValue: null,
   options: () => [],
-  backgroundColor: "#FFFFFF",
-  iconColor: "#8066C7",
-  swiperColor: "#8066C7",
+  backgroundColor: '#FFFFFF',
+  iconColor: '#8066C7',
+  swiperColor: '#8066C7',
   replaceRoute: false,
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
 const route = useRoute();
@@ -66,14 +73,14 @@ const borderSwiperRef = ref<HTMLElement>();
 const btnContainerRef = ref<HTMLElement>();
 
 const cssVariables = computed(() => ({
-  "--swiper-color": props.swiperColor,
-  "--icon-color": props.iconColor,
-  "--background-color": props.backgroundColor,
+  '--swiper-color': props.swiperColor,
+  '--icon-color': props.iconColor,
+  '--background-color': props.backgroundColor,
 }));
 
 watch(
   () => currSelected.value,
-  (newVal) => {
+  newVal => {
     if (borderSwiperRef.value) {
       borderSwiperRef.value.style.transform = `translateX(${
         btnItemWidth.value * newVal
@@ -87,7 +94,7 @@ watch(
   (newVal, oldVal) => {
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
-        (option) => option.id == newVal
+        option => option.id == newVal
       );
 
       if (target > -1) {
@@ -97,12 +104,33 @@ watch(
   }
 );
 
+watch(
+  route,
+  newRoute => {
+    if (newRoute) {
+      nextTick(() => {
+        const target = localOptions.value.findIndex((option: SwipeOption) => {
+          if (typeof option.path === 'string') {
+            return option.path === newRoute.path;
+          } else {
+            return (option.path || {}).name === newRoute.name;
+          }
+        });
+        if (target > -1) {
+          handleButtonClick(localOptions.value[target], target);
+        }
+      });
+    }
+  },
+  { immediate: true }
+);
+
 function cssLoader() {
   if (btnContainerRef.value && Array.isArray(btnContainerRef.value)) {
     btnItemWidth.value = btnContainerRef.value[0].offsetWidth;
   }
   if (borderSwiperRef.value) {
-    borderSwiperRef.value.style.width = btnItemWidth.value + "px";
+    borderSwiperRef.value.style.width = btnItemWidth.value + 'px';
     borderSwiperRef.value.style.transform = `translateX(${
       btnItemWidth.value * currSelected.value
     }px)`;
@@ -130,7 +158,7 @@ function handleButtonClick(button: SwipeOption, index: number) {
 }
 
 function updateValue(button: SwipeOption) {
-  emit("update:modelValue", button.id);
+  emit('update:modelValue', button.id);
 
   enableWatch.value = false;
   setTimeout(() => {
@@ -148,18 +176,18 @@ function updateValue(button: SwipeOption) {
 
 onMounted(() => {
   cssLoader();
-  window.addEventListener("resize", onResize);
+  window.addEventListener('resize', onResize);
 });
 
-onBeforeUnmount(() => window.removeEventListener("resize", onResize));
+onBeforeUnmount(() => window.removeEventListener('resize', onResize));
 
 localOptions.value = props.options.slice();
-const index = localOptions.value.findIndex((item) => {
+const index = localOptions.value.findIndex(item => {
   if (item.id == props.modelValue) {
     return true;
   }
 
-  if (typeof item.path === "object") {
+  if (typeof item.path === 'object') {
     return (item.path || {}).name == (route || {}).name;
   }
 

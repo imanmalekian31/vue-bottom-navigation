@@ -41,10 +41,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, computed, watch, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-import type { GrowOption } from "@/types";
+import type { GrowOption } from '@/types';
 
 type GrowProps = {
   modelValue: number | string | null;
@@ -56,10 +56,10 @@ type GrowProps = {
 const props = withDefaults(defineProps<GrowProps>(), {
   modelValue: null,
   options: () => [],
-  color: "#74CBBB",
+  color: '#74CBBB',
   replaceRoute: false,
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
 const route = useRoute();
@@ -80,9 +80,9 @@ const cssVariables = computed(() => {
     (localOptions.value[currSelected.value] || {}).color || props.color;
 
   const styles = {
-    "--color": mainColor,
-    "--color-background": mainColor + "30",
-    "--active-width": `${activeWidth}px`,
+    '--color': mainColor,
+    '--color-background': mainColor + '30',
+    '--active-width': `${activeWidth}px`,
   };
 
   return styles;
@@ -93,7 +93,7 @@ watch(
   (newVal, oldVal) => {
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
-        (option) => option.id == newVal
+        option => option.id == newVal
       );
 
       if (target > -1) {
@@ -101,6 +101,27 @@ watch(
       }
     }
   }
+);
+
+watch(
+  route,
+  newRoute => {
+    if (newRoute) {
+      nextTick(() => {
+        const target = localOptions.value.findIndex((option: GrowOption) => {
+          if (typeof option.path === 'string') {
+            return option.path === newRoute.path;
+          } else {
+            return (option.path || {}).name === newRoute.name;
+          }
+        });
+        if (target > -1) {
+          handleButtonClick(localOptions.value[target], target);
+        }
+      });
+    }
+  },
+  { immediate: true }
 );
 
 function handleButtonClick(button: GrowOption, index: number) {
@@ -121,7 +142,7 @@ function handleButtonClick(button: GrowOption, index: number) {
 }
 
 function updateValue(button: GrowOption) {
-  emit("update:modelValue", button.id);
+  emit('update:modelValue', button.id);
 
   enableWatch.value = false;
   setTimeout(() => {
@@ -143,7 +164,7 @@ const index = localOptions.value.findIndex((item: GrowOption) => {
     return true;
   }
 
-  if (typeof item.path === "object") {
+  if (typeof item.path === 'object') {
     return (item.path || {}).name == (route || {}).name;
   }
 

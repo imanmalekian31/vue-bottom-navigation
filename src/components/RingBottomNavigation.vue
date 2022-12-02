@@ -40,10 +40,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { ref, computed, watch, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-import type { RingOption } from "@/types";
+import type { RingOption } from '@/types';
 
 type RingProps = {
   modelValue: number | string | null;
@@ -58,13 +58,13 @@ type RingProps = {
 const props = withDefaults(defineProps<RingProps>(), {
   modelValue: null,
   options: () => [],
-  titleColor: "#669C35",
-  borderColor: "#4F7A28",
-  backgroundColor: "#FFFFFF",
-  badgeColor: "#FBC02D",
+  titleColor: '#669C35',
+  borderColor: '#4F7A28',
+  backgroundColor: '#FFFFFF',
+  badgeColor: '#FBC02D',
   replaceRoute: false,
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
 const route = useRoute();
@@ -75,11 +75,11 @@ const localOptions = ref<RingOption[]>([]);
 const enableWatch = ref<boolean>(true);
 
 const cssVariables = computed(() => ({
-  "--border-color": props.borderColor,
-  "--icon-color": props.iconColor,
-  "--background-color": props.backgroundColor,
-  "--title-color": props.titleColor,
-  "--badge-color": props.badgeColor,
+  '--border-color': props.borderColor,
+  '--icon-color': props.iconColor,
+  '--background-color': props.backgroundColor,
+  '--title-color': props.titleColor,
+  '--badge-color': props.badgeColor,
 }));
 
 watch(
@@ -87,7 +87,7 @@ watch(
   (newVal, oldVal) => {
     if (newVal != oldVal && enableWatch.value) {
       const target = localOptions.value.findIndex(
-        (option) => option.id == newVal
+        option => option.id == newVal
       );
 
       if (target > -1) {
@@ -95,6 +95,27 @@ watch(
       }
     }
   }
+);
+
+watch(
+  route,
+  newRoute => {
+    if (newRoute) {
+      nextTick(() => {
+        const target = localOptions.value.findIndex((option: RingOption) => {
+          if (typeof option.path === 'string') {
+            return option.path === newRoute.path;
+          } else {
+            return (option.path || {}).name === newRoute.name;
+          }
+        });
+        if (target > -1) {
+          handleButtonClick(localOptions.value[target], target);
+        }
+      });
+    }
+  },
+  { immediate: true }
 );
 
 function handleButtonClick(button: RingOption, index: number) {
@@ -121,7 +142,7 @@ function handleButtonClick(button: RingOption, index: number) {
 }
 
 function updateValue(button: RingOption) {
-  emit("update:modelValue", button.id);
+  emit('update:modelValue', button.id);
 
   enableWatch.value = false;
   setTimeout(() => {
@@ -138,12 +159,12 @@ function updateValue(button: RingOption) {
 }
 
 localOptions.value = props.options.slice();
-const index = localOptions.value.findIndex((item) => {
+const index = localOptions.value.findIndex(item => {
   if (item.id == props.modelValue) {
     return true;
   }
 
-  if (typeof item.path === "object") {
+  if (typeof item.path === 'object') {
     return (item.path || {}).name == (route || {}).name;
   }
 

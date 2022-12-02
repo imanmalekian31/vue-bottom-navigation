@@ -75,10 +75,10 @@ import {
   onMounted,
   onBeforeUnmount,
   nextTick,
-} from "vue";
-import { useRouter } from "vue-router";
+} from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
-import type { CurvedOption, Child } from "@/types";
+import type { CurvedOption, Child } from '@/types';
 
 type CurvedProps = {
   modelValue: number | string | null;
@@ -93,15 +93,16 @@ type CurvedProps = {
 const props = withDefaults(defineProps<CurvedProps>(), {
   modelValue: null,
   options: () => [],
-  foregroundColor: "#42A5F5",
-  backgroundColor: "#FFFFFF",
-  iconColor: "#0000008A",
-  badgeColor: "#FBC02D",
+  foregroundColor: '#42A5F5',
+  backgroundColor: '#FFFFFF',
+  iconColor: '#0000008A',
+  badgeColor: '#FBC02D',
   replaceRoute: false,
 });
-const emit = defineEmits(["update:modelValue"]);
+const emit = defineEmits(['update:modelValue']);
 
 const router = useRouter();
+const route = useRoute();
 
 const localOptions = ref<CurvedOption[]>([]);
 const showable = ref<boolean>(false);
@@ -114,11 +115,11 @@ const cssVariables = computed(() => {
   ).length;
 
   const styles = {
-    "--color-foreground": props.foregroundColor,
-    "--color-background": props.backgroundColor,
-    "--color-icon": props.iconColor,
-    "--color-badge": props.badgeColor,
-    "--width-parent": `${countChilds * 45}px`,
+    '--color-foreground': props.foregroundColor,
+    '--color-background': props.backgroundColor,
+    '--color-icon': props.iconColor,
+    '--color-badge': props.badgeColor,
+    '--width-parent': `${countChilds * 45}px`,
   };
 
   return styles;
@@ -133,12 +134,12 @@ watch(
     if (newVal != oldVal && enableWatch.value) {
       const childs: Child[] = [];
       localOptions.value.forEach((option: CurvedOption) => {
-        if (option.childs) {
+        if (hasChild(option) && option.childs) {
           childs.push(...option.childs);
         }
       });
       const target = [...localOptions.value, ...childs].find(
-        (option) => option.id == newVal
+        option => option.id == newVal
       );
       if (target) {
         updateValue(target, hasChild(target));
@@ -149,9 +150,9 @@ watch(
 
 watch(
   () => props.options,
-  (newVal) => {
+  newVal => {
     if (newVal) {
-      localOptions.value = newVal.map((option) => ({
+      localOptions.value = newVal.map(option => ({
         ...option,
         isActive: isActive(option),
       }));
@@ -161,10 +162,39 @@ watch(
   { deep: true }
 );
 
+watch(
+  route,
+  newRoute => {
+    if (newRoute) {
+      nextTick(() => {
+        const childs: Child[] = [];
+        localOptions.value.forEach((option: CurvedOption) => {
+          if (hasChild(option) && option.childs) {
+            childs.push(...option.childs);
+          }
+        });
+        const target = [...localOptions.value, ...childs]
+          .filter(item => item.path)
+          .find(option => {
+            if (typeof option.path === 'string') {
+              return option.path === newRoute.path;
+            } else {
+              return (option.path || {}).name === newRoute.name;
+            }
+          });
+        if (target) {
+          updateValue(target, hasChild(target));
+        }
+      });
+    }
+  },
+  { immediate: true }
+);
+
 function cssLoader() {
-  let customStyle = "";
+  let customStyle = '';
   const containerWidth =
-    (document.querySelector(".btn-container") as HTMLElement).offsetWidth ||
+    (document.querySelector('.btn-container') as HTMLElement).offsetWidth ||
     window.innerWidth;
 
   props.options.forEach((item, index) => {
@@ -199,12 +229,12 @@ function cssLoader() {
     }
   });
 
-  (document.getElementById("sweep") as HTMLElement).style.left = `
+  (document.getElementById('sweep') as HTMLElement).style.left = `
       ${containerWidth / props.options.length / 4 - 135 / 2}px`;
 
-  const head = document.getElementsByTagName("head")[0];
-  const style = document.createElement("style");
-  style.id = "bottom-navigation-style";
+  const head = document.getElementsByTagName('head')[0];
+  const style = document.createElement('style');
+  style.id = 'bottom-navigation-style';
 
   if (style.styleSheet) {
     style.styleSheet.cssText = customStyle;
@@ -231,7 +261,7 @@ function updateValue(button: CurvedOption, prevent = false) {
   );
 
   if (!prevent) {
-    emit("update:modelValue", button.id);
+    emit('update:modelValue', button.id);
     enableWatch.value = false;
     setTimeout(() => {
       enableWatch.value = true;
@@ -252,12 +282,12 @@ function toggleClass() {
 function isActive(button: CurvedOption, value = props.modelValue): boolean {
   return (
     button.id == value ||
-    Boolean((button.childs || []).find((child) => child.id == value))
+    Boolean((button.childs || []).find(child => child.id == value))
   );
 }
 function onResize() {
   nextTick(() => {
-    const styleElement = document.getElementById("bottom-navigation-style");
+    const styleElement = document.getElementById('bottom-navigation-style');
     styleElement && styleElement.remove();
   });
 
@@ -270,10 +300,10 @@ function hasChild(button: CurvedOption): boolean {
 
 onMounted(() => {
   cssLoader();
-  window.addEventListener("resize", onResize);
+  window.addEventListener('resize', onResize);
 });
 
-onBeforeUnmount(() => window.removeEventListener("resize", onResize));
+onBeforeUnmount(() => window.removeEventListener('resize', onResize));
 
 localOptions.value = props.options.map((option: CurvedOption) => ({
   ...option,
@@ -399,7 +429,7 @@ input {
 }
 
 #sweep-left:before {
-  content: "";
+  content: '';
   display: block;
   width: 220%;
   height: 200%;
@@ -419,7 +449,7 @@ input {
 }
 
 #sweep-right:before {
-  content: "";
+  content: '';
   display: block;
   width: 220%;
   height: 200%;

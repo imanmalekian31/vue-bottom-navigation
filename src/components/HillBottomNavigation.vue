@@ -194,6 +194,12 @@ if (index > -1) {
   box-sizing: border-box;
 }
 
+@media (min-width: 576px) {
+  .hill-btn-container {
+    cursor: pointer;
+  }
+}
+
 .hill-btn-item {
   width: 100%;
   height: 100%;

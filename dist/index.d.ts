@@ -98,3 +98,19 @@ export interface WindowsProps {
     iconColor?: string;
     replaceRoute?: boolean;
 }
+export interface HillOption {
+    id: number | string;
+    icon?: string;
+    badge?: number;
+    selected?: boolean;
+    deselect?: boolean;
+    path?: Path | string;
+}
+export interface HillProps {
+    modelValue: number | string | null;
+    options: HillOption[];
+    color?: string;
+    backgroundColor?: string;
+    badgeColor?: string;
+    replaceRoute?: boolean;
+}

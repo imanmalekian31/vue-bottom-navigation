@@ -1,5 +1,9 @@
 # vue-bottom-navigation
 
+<p align="center">
+<img width="200" height="200" src="https://user-images.githubusercontent.com/58827166/225915338-08ae5d0c-2eb8-4b79-ba70-7e6bb482c380.png" />
+</p>
+
 ## Documents
 
 [Documents](https://vue-bottom-navigation.netlify.app/)

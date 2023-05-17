@@ -103,7 +103,6 @@ export interface HillOption {
     icon?: string;
     badge?: number;
     selected?: boolean;
-    deselect?: boolean;
     path?: Path | string;
 }
 export interface HillProps {
@@ -112,5 +111,19 @@ export interface HillProps {
     color?: string;
     backgroundColor?: string;
     badgeColor?: string;
+    replaceRoute?: boolean;
+}
+export interface FlashlightOption {
+    id: number | string;
+    icon?: string;
+    selected?: boolean;
+    path?: Path | string;
+}
+export interface FlashlightProps {
+    modelValue: number | string | null;
+    options: HillOption[];
+    flashlightColor?: string;
+    backgroundColor?: string;
+    iconColor?: string;
     replaceRoute?: boolean;
 }
